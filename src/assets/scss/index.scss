@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import 'layout/grid.scss';
+@import 'components/react-modal.scss';
 
 body {
     font-family: 'Source Sans Pro', 'Roboto', 'sans-serif' !important;

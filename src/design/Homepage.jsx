@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import RoomFoundModal from '../components/modals/RoomFound.modal';
+
 function Homepage() {
     return (
         <div className='flex flex-col justify-between h-screen p-3 md:p-10 text-shiro'>
@@ -43,7 +45,9 @@ function Homepage() {
                     </div>
                 </div>
             </div>
-            <div></div>
+            <div>
+                <RoomFoundModal/>
+            </div>
         </div>
     )
 }

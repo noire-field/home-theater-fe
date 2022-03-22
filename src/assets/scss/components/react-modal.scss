@@ -1,0 +1,25 @@
+.ReactModal {
+    &__Overlay {
+        opacity: 0;
+        transition: opacity 0.15s;
+        background-color: rgba(0,0,0,0.45) !important;
+        &--after-open {
+            opacity: 1;
+        }
+        &--before-close{
+            opacity: 0;
+        }   
+    }
+
+    &__Content {
+        color: white !important;
+        background-color: black !important;
+        border: 1px solid rgba(100,100,100,0.35) !important;
+        -webkit-box-shadow: 0px 0px 14px 3px rgba(0,0,0,0.35) !important;
+        -moz-box-shadow: 0px 0px 14px 3px rgba(0,0,0,0.35) !important;
+        box-shadow: 0px 0px 14px 3px rgba(0,0,0,0.35) !important;
+
+        
+        max-width: 100% !important;
+    }
+}
