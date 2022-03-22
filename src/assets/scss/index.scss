@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'layout/grid.scss';
+
+body {
+    font-family: 'Source Sans Pro', 'Roboto', 'sans-serif' !important;
+}
+
+.test-line {
+    border: 1px solid red;
+}
