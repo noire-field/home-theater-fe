@@ -1,10 +1,10 @@
 import React from 'react';
 
-import Homepage from './design/Homepage';
+import AdminManager from './design/AdminManager';
 
 function App() {
   	return (
-		<Homepage/>
+		<AdminManager/>
   	);
 }
 
