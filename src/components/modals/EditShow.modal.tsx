@@ -17,10 +17,10 @@ function CreateShowModal() {
     }
 
     return (
-        <Modal isOpen={show} onRequestClose={onCloseModal} style={StyleLarge} contentLabel="Modal: Create Show">
+        <Modal isOpen={show} onRequestClose={onCloseModal} style={StyleLarge} contentLabel="Modal: Edit Show">
             <div className="text-shiro bg-kuro-7 border-kuro-8 px-5 py-3 md:px-7 md:py-5">
                 <div className='flex flex-row justify-between mb-5'>
-                    <p className='text-3xl text-center'>Create Show</p>
+                    <p className='text-3xl text-center'>Edit Show</p>
                     <a onClick={onCloseModal} href="#" className='text-white transition-all hover:text-gray-200 text-3xl'><i className="far fa-times-circle"></i></a>
                 </div>
                 <div className='grid grid-cols-12 gap-4 mb-2 md:mb-5'>

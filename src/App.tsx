@@ -1,10 +1,10 @@
 import React from 'react';
 
-import AdminManager from './design/AdminManager';
+import RoomWaiting from './design/RoomWaiting';
 
 function App() {
   	return (
-		<AdminManager/>
+		<RoomWaiting/>
   	);
 }
 

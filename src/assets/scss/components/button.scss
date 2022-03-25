@@ -2,18 +2,26 @@
     @apply transition-all font-medium rounded-md px-4 py-2;
 
     &-green {
-        @apply text-white bg-green-600 hover:bg-green-700 active:bg-green-800 focus:ring-green-800;
+        @apply text-white bg-green-600 hover:bg-green-700 active:bg-green-800 focus:ring-green-700;
     }
 
     &-blue {
-        @apply text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-800;
+        @apply text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-700;
     }
 
     &-red {
-        @apply text-white bg-red-600 hover:bg-red-700 active:bg-red-800 focus:ring-red-800;
+        @apply text-white bg-red-600 hover:bg-red-700 active:bg-red-800 focus:ring-red-700;
     }
 
     &-yellow {
-        @apply text-gray-800 bg-yellow-300 hover:bg-yellow-400 active:bg-yellow-500 focus:ring-yellow-500;
+        @apply text-gray-800 bg-yellow-300 hover:bg-yellow-400 active:bg-yellow-500 focus:ring-yellow-400;
+    }
+
+    &-pink {
+        @apply text-white bg-pink-600 hover:bg-pink-700 active:bg-pink-800 focus:ring-pink-700;
+    }
+
+    &-sm {
+        @apply px-2 py-1;
     }
 }

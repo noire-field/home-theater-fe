@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import EditShowModal from '../components/modals/EditShow.modal';
+import ShowLogModal from '../components/modals/ShowLog.modal';
 
 function Homepage() {
     return (
@@ -107,7 +107,7 @@ function Homepage() {
                     </div>
                 </div>
             </div>
-            <EditShowModal/>
+            <ShowLogModal/>
         </div>
     )
 }
