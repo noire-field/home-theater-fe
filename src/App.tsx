@@ -1,10 +1,10 @@
 import React from 'react';
 
-import RoomWaiting from './design/RoomWaiting';
+import RoomWatching from './design/RoomWatching';
 
 function App() {
   	return (
-		<RoomWaiting/>
+		<RoomWatching/>
   	);
 }
 
