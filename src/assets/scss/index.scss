@@ -2,11 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@import 'base/animations.scss';
+
 @import 'layout/grid.scss';
 @import 'layout/watching-room.scss';
+
 @import 'components/react-modal.scss';
 @import 'components/button.scss';
 @import 'components/form.scss';
+@import 'components/loading-overlay.scss';
 
 body {
     font-family: 'Source Sans Pro', 'Roboto', 'sans-serif' !important;

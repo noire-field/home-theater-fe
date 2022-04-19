@@ -1,0 +1,64 @@
+.anim-slideup-loading-enter {
+    opacity: 0;
+    transform: translateY(50%);
+}
+.anim-slideup-loading-enter-active {
+    opacity: 1;
+    transform: translateY(0%);
+    transition: all 250ms;
+}
+.anim-slideup-loading-exit {
+    opacity: 1;
+}
+.anim-slideup-loading-exit-active {
+    opacity: 0;
+    transition: all 250ms;
+}
+
+.anim-fading-enter {
+    opacity: 0;
+}
+
+.anim-fading-enter-active {
+    opacity: 1;
+    transition: all 250ms;
+}
+
+.anim-fading-exit {
+    opacity: 1;
+}
+
+.anim-fading-active {
+    opacity: 0;
+    transition: all 250ms;
+}
+
+.fade-in-enter{
+    opacity: 0;
+}
+.fade-in-exit{
+    opacity: 0;
+}
+.fade-in-enter-active{
+    opacity: 1;
+}
+.fade-in-exit-active{
+    opacity: 0;
+}
+.fade-in-enter-active,
+.fade-in-exit-active{
+    transition: opacity 500ms;
+}
+
+@keyframes simple-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.simple-fade-in {
+    -webkit-animation: simple-fade-in 0.2s; /* Safari, Chrome and Opera > 12.1 */
+       -moz-animation: simple-fade-in 0.2s; /* Firefox < 16 */
+        -ms-animation: simple-fade-in 0.2s; /* Internet Explorer */
+         -o-animation: simple-fade-in 0.2s; /* Opera < 12.1 */
+            animation: simple-fade-in 0.2s;
+}

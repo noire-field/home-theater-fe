@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 //import { withStyles } from '@mui/styles';
 import { red } from '@mui/material/colors';
 import Slider from '@mui/material/Slider'
+import { useNavigate } from 'react-router-dom';
 
 /*
 const VideoSlider = withStyles({
@@ -19,6 +20,8 @@ const VideoSlider = withStyles({
 })(Slider);*/
 
 function RoomWatching() {
+    const navigate = useNavigate();
+
     const [progress, setProgress] = useState(0);
     const [sliding, setSliding] = useState(false);
     const muted = false;
@@ -30,7 +33,7 @@ function RoomWatching() {
     const isFullScreen = false;
 
     return (
-        <div className='watching-room'>
+        <div className='watching-room simple-fade-in'>
             <div className="wrapper">
 
                 <div className="loading text-white">
@@ -44,7 +47,7 @@ function RoomWatching() {
                         <div>
                             <div className='md:flex md:justify-between'>
                                 <div className=''>
-                                    <h1 className="text-3xl mt-10 md:mt-0 text-center uppercase">DOCTOR STRANGE (2013)</h1>
+                                    <h1 onClick={() => navigate('/', { replace: true} )} className="text-3xl mt-10 md:mt-0 text-center uppercase">DOCTOR STRANGE (2013)</h1>
                                 </div>
                                 <div className='w-500 max-w-full'>
                                     <div className="px-4 py-2 bg-blue-100 rounded-lg dark:bg-blue-200" role="alert">
