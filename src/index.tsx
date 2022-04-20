@@ -13,8 +13,15 @@ import './assets/scss/index.scss';
 import App from './App';
 import { store } from './store';
 
+import LangEN from './translations/english';
+import LangLT from './translations/lithuanian';
+
 i18n.use(i18nLangDetector).use(initReactI18next).init({
-    resources: { },
+    resources: { 
+		en: LangEN,
+		lt: LangLT
+	},
+	lng: "en",
     fallbackLng: "en",
     interpolation: {
     	escapeValue: false
