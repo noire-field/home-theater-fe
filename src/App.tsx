@@ -21,8 +21,8 @@ function App() {
 	const status = useSelector((state: RootState) => state.app.status);
 	const loading = useSelector((state: RootState) => state.app.loading);
 	
-		if(process.env.NODE_ENV === 'development')
-			console.log(`App: Render (Status: ${status} / Loading: ${loading}`);
+	if(process.env.NODE_ENV === 'development')
+		console.log(`App: Render (Status: ${status} / Loading: ${loading})`);
 
 	useEffect(() => {
 		switch(status) {

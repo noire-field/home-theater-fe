@@ -36,11 +36,14 @@ export const ShowSlice = createSlice({
         },
         ShowSetList(state, action: PayloadAction<MovieShow[]>) {
             state.list = action.payload;
+        },
+        ShowUnshift(state, action: PayloadAction<MovieShow>) {
+            state.list.unshift(action.payload);
         }
     }
 });
 
-export const { ShowSetFetched, ShowSetList } = ShowSlice.actions;
+export const { ShowSetFetched, ShowSetList, ShowUnshift } = ShowSlice.actions;
 
 // Export
 export default ShowSlice.reducer;

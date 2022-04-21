@@ -18,6 +18,15 @@ const Field = {
     "AdminPassword": "Admin's Password"
 }
 
+const StatusText = {
+    "Processing": "Đang Xử Lý",
+    "Scheduled": "Đã Lên Lịch",
+    "Watching": "Đang Chiếu",
+    "Finished": "Đã Kết Thúc",
+    "Cancelled": "Đã Hủy",
+    "Error": "Lỗi"
+}
+
 const Error = {
     "SomethingWentWrong": "Something went wrong",
     "InvalidCredentials": "Invalid credentials"
@@ -34,6 +43,7 @@ export default {
     Common,
     Manage,
     Action,
+    StatusText,
     Field,
     Language,
     Error

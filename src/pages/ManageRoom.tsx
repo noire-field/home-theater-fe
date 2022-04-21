@@ -5,11 +5,13 @@ import { useTranslation } from 'react-i18next';
 
 import { RootState, useAllDispatch } from './../store';
 import { ShowSetFetched, ShowSetList } from '../Show.slice';
+import { ModalShowToggleAdd } from '../Modal.slice';
 import { AppSetLoading } from '../App.slice';
 
 import Header from '../components/layouts/Header';
 import ShowList from '../components/ShowList';
-import ShowLogModal from '../components/modals/ShowLog.modal';
+import AddShowModal from '../components/modals/AddShow.modal';
+import EditShowModal from '../components/modals/EditShow.modal';
 
 import { AppAPI, AxiosError, AxiosResponse } from '../utils/api';
 
@@ -24,7 +26,7 @@ function ManageRoom() {
     const [errorCode, setErrorCode] = useState('');
 
     if(process.env.NODE_ENV === 'development')
-        console.log(`App >> ManageRoom: Render (Login: ${loggedIn} / Is Admin: ${isAdmin})`);
+        console.log(`App >> ManageRoom: Render (Login: ${loggedIn} / Is Admin: ${isAdmin} / Fetched: ${fetched})`);
 
     useEffect(() => {
         if(!loggedIn) return navigate('/admin-login?url=/manage-room');
@@ -52,8 +54,12 @@ function ManageRoom() {
         }
     }, [])
 
-    if(!loggedIn || !isAdmin)
+    if(!loggedIn || !isAdmin || !fetched)
         return null;
+
+    const onClickAdd = () => {
+        dispatch(ModalShowToggleAdd(true));
+    }
 
     return (
         <div className='flex flex-col justify-start h-screen p-3 md:p-10 text-shiro simple-fade-in'>
@@ -64,13 +70,14 @@ function ManageRoom() {
                 { errorCode.length > 0 && <p className='text-left text-pink-600 mb-2'>{ t(`${errorCode}`) }</p> }
                 <div className='flex flex-row justify-between align-middle mb-3'>
                     <h1 className='text-2xl'>{ t('Manage:ListOfShows') }</h1>
-                    <button type="button" className="btn btn-green"><i className="fa-solid fa-circle-plus mr-2"></i>{ t('Action:AddShow') }</button>
+                    <button onClick={onClickAdd} type="button" className="btn btn-green"><i className="fa-solid fa-circle-plus mr-2"></i>{ t('Action:AddShow') }</button>
                 </div>
                 <div>
                     <ShowList/>
                 </div>
             </div>
-            { /* <ShowLogModal/> */ }
+            <AddShowModal/>
+            <EditShowModal/>
         </div>
     )
 }
