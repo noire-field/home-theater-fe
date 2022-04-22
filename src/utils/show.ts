@@ -21,3 +21,20 @@ export function DurationSecondToText(duration: number): string {
 }
 
 export const PatternTime = /^(\d{1,2})\:(\d{1,2})\s(\d{4})\-(\d{1,2})\-(\d{1,2})$/gi;
+
+export const IsStartTimeValid = (rawTime: string): { valid: boolean, time?: Date } => {
+    var reTime: RegExpExecArray | null = new RegExp(PatternTime).exec(rawTime)
+
+    if(!reTime || reTime.length !== 6)
+        return { valid: false };
+
+    const F = (s:string) => s.length == 1 ? "0" + s : s;
+
+    // H 1 M 2, Y 3, M 4, D 5
+    const parsedTime = new Date(`${reTime[3]}-${F(reTime[4])}-${F(reTime[5])}T${F(reTime[1])}:${F(reTime[2])}:00`);
+    if(parsedTime.getTime() !== parsedTime.getTime()) {// Check for valid
+        return { valid: false };
+    }
+
+    return { valid: true, time: parsedTime }
+}

@@ -1,15 +1,17 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-modal';
 import { createSelector } from '@reduxjs/toolkit';
 
 import { RootState, useAllDispatch } from '../../store';
+import { AppSetLoading } from '../../App.slice';
 import { ModalShowToggleEdit } from '../../Modal.slice';
+import { MovieShow, ShowDelete, ShowUpdate } from '../../Show.slice';
 
 import { StyleLarge } from './../../utils/modal';
-import { MovieShow } from '../../Show.slice';
-import { UserSetLang } from '../../User.slice';
+import { IsStartTimeValid } from '../../utils/show';
+import { AppAPI, AxiosError, AxiosResponse } from '../../utils/api';
 
 interface ISelectMovie {
     list: MovieShow[];
@@ -59,11 +61,75 @@ function EditShowModal() {
     if(!movie) return null;
 
     const onClickUpdate = () => {
-        dispatch(UserSetLang('lt'));
+        // Parse StartTime
+        const rawTime = inputs.startTime.current?.value || '';
+        var startTime = IsStartTimeValid(rawTime);
+ 
+        if(!startTime.valid) {
+            setErrorCode(`Error:InvalidTimeFormat`);
+            return;
+        }
+        
+        setErrorCode('');
+        dispatch(AppSetLoading(true));
+ 
+        AppAPI.patch(`/shows/${movie.id}`, {
+            title: inputs.title.current?.value,
+            passCode: inputs.pinCode.current?.value,
+            movieUrl: inputs.movieUrl.current?.value,
+            subtitleUrl: inputs.subtitleUrl.current?.value,
+            startTime: startTime.time?.getTime().toString(),
+            smartSync: inputs.smartSync.current?.checked,
+            votingControl: inputs.votingControl.current?.checked
+        }).then((res: AxiosResponse) => {
+            if(res.status === 200) {
+                dispatch(ShowUpdate({ id: movie.id, show: res.data }));
+                dispatch(ModalShowToggleEdit({ show: false, id: -1 }))
+            }
+        }).catch((err: AxiosError) => {
+            if(err.response) {
+                setErrorCode(err.response.data.langCode || err.response.data.message);
+            } else setErrorCode('Error:SomethingWentWrong');
+        }).finally(() => {
+            dispatch(AppSetLoading(false));
+        });
+    }
+
+    const onClickDelete = () => {
+        if(window.confirm(t('Question:ReallyWantToDelete')) !== true)
+            return
+
+        dispatch(AppSetLoading(true));
+        AppAPI.delete(`/shows/${movie.id}`, { }).then((res: AxiosResponse) => {
+            if(res.status === 200) {
+                dispatch(ShowDelete(movie.id));
+                dispatch(ModalShowToggleEdit({ show: false, id: -1 }))
+            }
+        }).catch((err: AxiosError) => {
+            if(err.response) {
+                setErrorCode(err.response.data.langCode || err.response.data.message);
+            } else setErrorCode('Error:SomethingWentWrong');
+        }).finally(() => {
+            dispatch(AppSetLoading(false));
+        });
     }
 
     let startTime = new Date(movie.startTime);
     let simplifiedTime = `${startTime.getHours()}:${startTime.getMinutes()} ${startTime.getFullYear()}-${startTime.getMonth()+1}-${startTime.getDate()}`
+
+    var allowUpdate = false, allowDelete = false;
+    var extraTextCode = '';
+
+    if([1,5].indexOf(movie.status) !== -1) allowUpdate = true; // Allow edit only when in [Scheduled, Error]
+    if([3,4,5].indexOf(movie.status) !== -1) allowDelete = true; // Allow delete only when in [Finished, Cancelled, Error]
+
+    switch(movie.status) {
+        case 0: extraTextCode = 'Manage:ShowBeingProcessed'; break;
+        case 1: extraTextCode = 'Manage:ShowIsScheduled'; break;
+        case 2: extraTextCode = 'Manage:ShowBeingWatched'; break;
+        case 3: extraTextCode = 'Manage:ShowAlreadyFinished'; break;
+        case 4: extraTextCode = 'Manage:ShowAlreadyCancelled'; break;
+    }
 
     return (
         <Modal isOpen={show} onRequestClose={onCloseModal} style={StyleLarge} contentLabel="Modal: Edit Show">
@@ -114,10 +180,12 @@ function EditShowModal() {
                     </div>
                 </div>
                 <div className='flex flex-col md:flex-row justify-between align-middle'>
-                    <p className='text-gray-300 mt-2 mb-2 md:mb-0'><i className="fa-solid fa-circle-info mr-1"></i>{ t('Manage:ShowAlreadyFinished') }</p>
+                    <p className='text-gray-300 mt-2 mb-2 md:mb-0'>
+                        { errorCode.length > 0 ? <span className='text-center text-pink-600'>{ t(errorCode) }</span> : (extraTextCode.length > 0 ? <span>{ t(extraTextCode) }</span> : '') }
+                    </p>
                     <div className='text-right'>
-                        <button onClick={onClickUpdate} className='btn btn-yellow mr-2'><i className="fa-solid fa-pen-to-square mr-2"></i>{ t('Action:Update') }</button>
-                        <button className='btn btn-red'><i className="fa-solid fa-circle-minus mr-2"></i>{ t('Action:Delete') }</button>
+                        <button onClick={onClickUpdate} className='btn btn-yellow mr-2' disabled={!allowUpdate}><i className="fa-solid fa-pen-to-square mr-2"></i>{ t('Action:Update') }</button>
+                        <button onClick={onClickDelete} className='btn btn-red' disabled={!allowDelete}><i className="fa-solid fa-circle-minus mr-2"></i>{ t('Action:Delete') }</button>
                     </div>
                 </div>
             </div>

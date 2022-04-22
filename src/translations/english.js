@@ -6,7 +6,11 @@ const Manage = {
     "Authentication": "Dashboard Authentication",
     "ListOfShows": "List of shows",
     "ListNoShow": "There is no show",
-    "ShowAlreadyFinished": "This show is already finished"
+    "ShowBeingProcessed": "This show is being processed.",
+    "ShowIsScheduled": "This show is scheduled, cancel it first if you want to delete.",
+    "ShowBeingWatched": "This show is being watched.",
+    "ShowAlreadyFinished": "This show is already finished.",
+    "ShowAlreadyCancelled": "This show is already cancelled."
 }
 
 const Action = {
@@ -15,7 +19,8 @@ const Action = {
     "AddShow": "Add Show",
     "EditShow": "Edit Show",
     "Update": "Update",
-    "Delete": "Delete"
+    "Delete": "Delete",
+    "Refresh": "Refresh"
 }
 
 const Field = {
@@ -32,6 +37,10 @@ const Field = {
     "Addons": "Addons",
     "SmartSync": "Smart Sync",
     "VotingControl": "Voting Control"
+}
+
+const Question = {
+    "ReallyWantToDelete": "Are you sure you want to delete?"
 }
 
 const StatusText = {
@@ -68,6 +77,7 @@ export default {
     Manage,
     Action,
     StatusText,
+    Question,
     Field,
     Language,
     Error

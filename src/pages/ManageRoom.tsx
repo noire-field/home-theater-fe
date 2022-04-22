@@ -52,13 +52,17 @@ function ManageRoom() {
                 dispatch(AppSetLoading(false));
             });
         }
-    }, [])
+    }, [fetched])
 
     if(!loggedIn || !isAdmin || !fetched)
         return null;
 
     const onClickAdd = () => {
         dispatch(ModalShowToggleAdd(true));
+    }
+
+    const onClickRefresh = () => {
+        dispatch(ShowSetFetched(false));
     }
 
     return (
@@ -70,7 +74,10 @@ function ManageRoom() {
                 { errorCode.length > 0 && <p className='text-left text-pink-600 mb-2'>{ t(`${errorCode}`) }</p> }
                 <div className='flex flex-row justify-between align-middle mb-3'>
                     <h1 className='text-2xl'>{ t('Manage:ListOfShows') }</h1>
-                    <button onClick={onClickAdd} type="button" className="btn btn-green"><i className="fa-solid fa-circle-plus mr-2"></i>{ t('Action:AddShow') }</button>
+                    <div>
+                        <button onClick={onClickRefresh} type="button" className="btn btn-blue mr-2"><i className="fa-solid fa-arrow-rotate-right mr-2"></i>{ t('Action:Refresh') }</button>
+                        <button onClick={onClickAdd} type="button" className="btn btn-green"><i className="fa-solid fa-circle-plus mr-2"></i>{ t('Action:AddShow') }</button>
+                    </div>
                 </div>
                 <div>
                     <ShowList/>

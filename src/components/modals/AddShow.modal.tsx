@@ -7,7 +7,7 @@ import { RootState, useAllDispatch } from '../../store';
 import { ModalShowToggleAdd } from '../../Modal.slice';
 
 import { StyleLarge } from './../../utils/modal';
-import { PatternTime } from '../../utils/show';
+import { IsStartTimeValid } from '../../utils/show';
 import { AppSetLoading } from '../../App.slice';
 import { AppAPI, AxiosError, AxiosResponse } from '../../utils/api';
 import { ShowUnshift } from '../../Show.slice';
@@ -42,22 +42,13 @@ function AddShowModal() {
 
         // Parse StartTime
         const rawTime = inputs.startTime.current?.value || '';
-        var reTime: RegExpExecArray | null = new RegExp(PatternTime).exec(rawTime)
+        var startTime = IsStartTimeValid(rawTime);
 
-        if(!reTime || reTime.length !== 6) {
+        if(!startTime.valid) {
             setErrorCode(`Error:InvalidTimeFormat`);
             return;
         }
-
-        const F = (s:string) => s.length == 1 ? "0" + s : s;
-
-        // H 1 M 2, Y 3, M 4, D 5
-        const parsedTime = new Date(`${reTime[3]}-${F(reTime[4])}-${F(reTime[5])}T${F(reTime[1])}:${F(reTime[2])}:00`);
-        if(parsedTime.getTime() !== parsedTime.getTime()) {// Check for valid
-            setErrorCode(`Error:InvalidTimeFormat`);
-            return;
-        }
-
+        
         setErrorCode('');
         dispatch(AppSetLoading(true));
 
@@ -66,7 +57,7 @@ function AddShowModal() {
             passCode: inputs.pinCode.current?.value,
             movieUrl: inputs.movieUrl.current?.value,
             subtitleUrl: inputs.subtitleUrl.current?.value,
-            startTime: parsedTime.getTime().toString(),
+            startTime: startTime.time?.getTime().toString(),
             smartSync: inputs.smartSync.current?.checked,
             votingControl: inputs.votingControl.current?.checked
         }).then((res: AxiosResponse) => {
