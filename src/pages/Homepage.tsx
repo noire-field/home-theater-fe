@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import Header from './../components/layouts/Header';
 import RoomFoundModal from '../components/modals/RoomFound.modal';
+
+import AppSocket from './../utils/socket';
 
 function Homepage() {
     const navigate = useNavigate();
@@ -18,6 +20,11 @@ function Homepage() {
         e.preventDefault();
         alert('OK');
     }
+
+    useEffect(() => {
+        AppSocket.Connect();
+        console.log('Connect');
+    }, [])
 
     return (
         <div className='flex flex-col justify-between h-screen p-3 md:p-10 text-shiro simple-fade-in'>
