@@ -13,6 +13,14 @@ const Manage = {
     "ShowAlreadyCancelled": "This show is already cancelled."
 }
 
+const Watch = {
+    "RoomFound": {
+        "JoiningRoom": "Joining Room",
+        "WeFoundRoom": "We found a room that matches your code!",
+        "WhyFriendlyName": "This will help friends in room to recognize you easily."
+    }
+}
+
 const Action = {
     "ManageRoom": "Manage Room",
     "FindRoom": "Find Room",
@@ -20,7 +28,8 @@ const Action = {
     "EditShow": "Edit Show",
     "Update": "Update",
     "Delete": "Delete",
-    "Refresh": "Refresh"
+    "Refresh": "Refresh",
+    "JoinRoom": "Join Room"
 }
 
 const Field = {
@@ -36,7 +45,8 @@ const Field = {
     "MovieUrl": "Movie Url",
     "Addons": "Addons",
     "SmartSync": "Smart Sync",
-    "VotingControl": "Voting Control"
+    "VotingControl": "Voting Control",
+    "MyFriendlyName": "My Friendly Name"
 }
 
 const Question = {
@@ -62,6 +72,9 @@ const Error = {
         "PassCodeIsBeingUsed": "This pin code is being used by other show.",
         "UnableToParseSubtitle": "Unable to parse this subtitle url.",
         "UnableToVerifyVideoUrl": "Unable to verify this video url."
+    },
+    "Watch": {
+        "RoomNotFound": "Unable to find room with this code."
     }
 }
 
@@ -75,6 +88,7 @@ const Language = {
 export default {
     Common,
     Manage,
+    Watch,
     Action,
     StatusText,
     Question,

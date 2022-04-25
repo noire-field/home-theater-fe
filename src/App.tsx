@@ -9,10 +9,12 @@ import { RootState, useAllDispatch } from './store';
 import { AppSetLoading, AppSetStatus } from './App.slice';
 import { UserSetLang, UserSetLogin } from './User.slice';
 
-import LoadingOverlay from './components/LoadingOverlay';
 import Homepage from './pages/Homepage';
 import ManageRoom from './pages/ManageRoom';
 import AdminLogin from './pages/AdminLogin';
+import WatchingRoom from './pages/WatchingRoom';
+
+import LoadingOverlay from './components/LoadingOverlay';
 
 function App() {
 	const dispatch = useAllDispatch();
@@ -60,6 +62,7 @@ function App() {
 					<Route path="/" element={<Homepage />}/>
 					<Route path="/manage-room" element={<ManageRoom />}/>
 					<Route path="/admin-login" element={<AdminLogin />}/>
+					<Route path="/watch/:passCode" element={<WatchingRoom />}/>
 				</Routes> 
 			}
             <CSSTransition in={loading} timeout={250} classNames="anim-fading" unmountOnExit>
