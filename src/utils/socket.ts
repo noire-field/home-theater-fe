@@ -1,5 +1,8 @@
 import io, { Socket } from "socket.io-client";
 
+import { store } from './../store';
+import { IViewer, WatchSetSocketConnected, WatchSetViewers, WatchSetStartTime } from "../Watch.slice";
+
 class AppSocket {
     private established: boolean;
     private client: Socket;
@@ -14,6 +17,14 @@ class AppSocket {
         this.client.on('connect_error', this.OnConnectError);
         this.client.on('connect', this.OnConnect);
         this.client.on('disconnect', this.OnDisconnect);
+        
+        // Custom Handlers
+        this.client.on('UpdateViewers', this.OnUpdateViewers);
+        this.client.on('UpdateStartTime', this.OnUpdateStartTime);
+    }
+
+    GetClient(): Socket {
+        return this.client;
     }
 
     Connect(): boolean {
@@ -26,7 +37,7 @@ class AppSocket {
     }
 
     OnConnect() {
-        console.log('Connected');
+        store.dispatch(WatchSetSocketConnected(true));
     }
 
     OnDisconnect(reason: string) {
@@ -35,6 +46,14 @@ class AppSocket {
 
     OnConnectError(error: Error) {
         console.log(error.message);
+    }
+
+    OnUpdateViewers(viewers: IViewer[]) {
+        store.dispatch(WatchSetViewers(viewers));
+    }
+
+    OnUpdateStartTime(newStartTime: number) {
+        store.dispatch(WatchSetStartTime(newStartTime));
     }
 }
 

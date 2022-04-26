@@ -29,7 +29,10 @@ const Action = {
     "Update": "Update",
     "Delete": "Delete",
     "Refresh": "Refresh",
-    "JoinRoom": "Join Room"
+    "JoinRoom": "Join Room",
+    "PreviewMovie": "Preview Movie",
+    "AddWaitTime": "More 5 Minutes Wait",
+    "StartNow": "Start Now"
 }
 
 const Field = {
@@ -46,7 +49,8 @@ const Field = {
     "Addons": "Addons",
     "SmartSync": "Smart Sync",
     "VotingControl": "Voting Control",
-    "MyFriendlyName": "My Friendly Name"
+    "MyFriendlyName": "My Friendly Name",
+    "Viewers": "Viewers"
 }
 
 const Question = {
