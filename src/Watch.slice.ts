@@ -19,8 +19,8 @@ export interface ISetJoinedState {
 }
 
 export interface WatchState {
-    joinedRoom: boolean;
     passCode: string;
+    joinedRoom: boolean;
     socketConnected: boolean;
 
     show: {
@@ -29,18 +29,36 @@ export interface WatchState {
         subtitles: ISubtitleLine[];
     };
     viewers: IViewer[];
+    player: {
+        isBuffering: boolean;
+        isPlaying: boolean;
+        progress: number;
+        duration: number;
+        volume: number;
+        muted: boolean;
+        isFullScreen: boolean;
+    }
 }
 
 const initialState: WatchState = {
-    joinedRoom: false,
     passCode: '',
+    joinedRoom: false,
     socketConnected: false,
     show: {
         title: '',
         realStartTime: '0',
         subtitles: []
     },
-    viewers: []
+    viewers: [],
+    player: {
+        isBuffering: false,
+        isPlaying: false,
+        progress: 0.0,
+        duration: 125.933333,
+        volume: 0.0,
+        muted: false,
+        isFullScreen: false
+    }
 }
 
 export const WatchSlice = createSlice({
@@ -64,11 +82,21 @@ export const WatchSlice = createSlice({
         },
         WatchSetStartTime(state, action: PayloadAction<number>) {
             state.show.realStartTime = new Date(action.payload).toString();
-        }
+        },
+        WatchSetPlayerBuffering(state, action: PayloadAction<boolean>) { state.player.isBuffering = action.payload },
+        WatchSetPlayerPlaying(state, action: PayloadAction<boolean>) { state.player.isPlaying = action.payload },
+        WatchSetPlayerProgress(state, action: PayloadAction<number>) { state.player.progress = action.payload },
+        WatchSetPlayerVolume(state, action: PayloadAction<number>) { state.player.volume = action.payload },
+        WatchSetPlayerMuted(state, action: PayloadAction<boolean>) { state.player.muted = action.payload },
+        WatchSetPlayerFullScreen(state, action: PayloadAction<boolean>) { state.player.isFullScreen = action.payload },
+
     }
 });
 
-export const { WatchSetSocketConnected, WatchSetJoined, WatchSetSubtitle, WatchSetViewers, WatchSetStartTime } = WatchSlice.actions;
+export const { 
+    WatchSetSocketConnected, WatchSetJoined, WatchSetSubtitle, WatchSetViewers, WatchSetStartTime,
+    WatchSetPlayerBuffering, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetPlayerMuted, WatchSetPlayerFullScreen
+} = WatchSlice.actions;
 
 // Export
 export default WatchSlice.reducer;

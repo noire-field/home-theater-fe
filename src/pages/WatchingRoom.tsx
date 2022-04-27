@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import RoomWaiting from './RoomWaiting';
+import RoomWatching from './RoomWatching';
 
 import { RootState, useAllDispatch } from '../store';
 import { AppSetLoading } from '../App.slice';
@@ -16,6 +17,7 @@ function WatchingRoom() {
     let { passCode } = useParams();
     const joinedRoom = useSelector((state: RootState) => state.watch.joinedRoom);
     const socketConnected = useSelector((state: RootState) => state.watch.socketConnected);
+    //const watching = useSelector((state: RootState) => state.watch.)
     
     if(process.env.NODE_ENV === 'development')
         console.log(`App >> WatchingRoom: Render (PassCode: ${passCode})`);
@@ -64,7 +66,7 @@ function WatchingRoom() {
 
     return (
         <React.Fragment>
-            <RoomWaiting/>
+            <RoomWatching/>
         </React.Fragment>
     )
 }

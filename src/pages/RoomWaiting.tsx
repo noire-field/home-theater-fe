@@ -7,6 +7,7 @@ import { AppSetLoading } from '../App.slice';
 
 import Header from '../components/layouts/Header';
 import CountdownTimer from '../components/CountdownTimer';
+import { AppAPI, AxiosError, AxiosResponse } from '../utils/api';
 
 function RoomWaiting() {
     const dispatch = useAllDispatch();
@@ -14,12 +15,23 @@ function RoomWaiting() {
 
     const showTitle = useSelector((state: RootState) => state.watch.show.title);
     const viewers = useSelector((state: RootState) => state.watch.viewers);
+    const passCode = useSelector((state: RootState) => state.watch.passCode);
 
     if(process.env.NODE_ENV === 'development')
         console.log(`App >> WatchingRoom > RoomWaiting: Render`);
 
     const onClickAddMoreTime = () => {
         dispatch(AppSetLoading(true));
+
+        AppAPI.patch(`/watch/room/${passCode}/add-wait-time`, { 
+            minuteAmount: 5
+        }).then((res: AxiosResponse) => {
+            if(res.status === 200) { }
+        }).catch((res: AxiosError) => {
+
+        }).finally(() => {
+            dispatch(AppSetLoading(false));
+        });
     }
 
     return (

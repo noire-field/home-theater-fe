@@ -78,7 +78,8 @@ const Error = {
         "UnableToVerifyVideoUrl": "Unable to verify this video url."
     },
     "Watch": {
-        "RoomNotFound": "Unable to find room with this code."
+        "RoomNotFound": "Unable to find room with this code.",
+        "UnableToEnterFullScreen": "Unable to enter full-screen mode, permission denied."
     }
 }
 
