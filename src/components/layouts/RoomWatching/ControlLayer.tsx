@@ -11,7 +11,7 @@ import { red } from '@mui/material/colors';
 import Slider from '@mui/material/Slider'
 
 import { RootState, useAllDispatch } from '../../../store';
-import { WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerVolume } from '../../../Watch.slice';
+import { WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume } from '../../../Watch.slice';
 
 import { DurationSecondToText } from '../../../utils/show';
 
@@ -22,6 +22,7 @@ const theme = createTheme({
 });
 
 interface IControlLayerProps {
+    refPlayer: any;
     refBackward: LegacyRef<HTMLDivElement> | undefined;
     refForward: LegacyRef<HTMLDivElement> | undefined;
     refPlayPause: LegacyRef<HTMLDivElement> | undefined;
@@ -34,6 +35,7 @@ function ControlLayer(props: IControlLayerProps) {
     const showTitle = useSelector((state: RootState) => state.watch.show.title);
     const videoProgress = useSelector((state: RootState) => state.watch.player.progress);
     const videoDuration = useSelector((state: RootState) => state.watch.player.duration);
+    const allowControl = useSelector((state: RootState) => state.watch.player.allowControl);
 
     const isPlaying = useSelector((state: RootState) => state.watch.player.isPlaying);
     const isFullScreen = useSelector((state: RootState) => state.watch.player.isFullScreen);
@@ -43,11 +45,12 @@ function ControlLayer(props: IControlLayerProps) {
     const [sliding, setSliding] = useState(false);
     const [volume, setVolume] = useState(0.0);
     
-
     if(process.env.NODE_ENV === 'development')
         console.log(`App >> WatchingRoom > RoomWatching > (3)ControlLayer: Render`);
 
     const onProgressSliderChange = (event: Event, value: number | number[], activeThumb: number) => { 
+        if(!allowControl) return;
+
         const newProgress = Number(value);
         if(sliderProgress === newProgress) return;
 
@@ -58,6 +61,8 @@ function ControlLayer(props: IControlLayerProps) {
     }
 
     const onClickPlayPause = () => {
+        if(!allowControl) return;
+
         dispatch(WatchSetPlayerPlaying(!isPlaying));
         if(isPlaying) { // Stop
             dispatch(WatchSetPlayerBuffering(false));
@@ -65,6 +70,8 @@ function ControlLayer(props: IControlLayerProps) {
     }
 
     const onFastMove = (forward: boolean) => {
+        if(!allowControl) return;
+
         var targetProgress = (sliding ? sliderProgress : videoProgress) + (forward ? 10 : -10);
         targetProgress = Math.max(0, Math.min(targetProgress,videoDuration));
 
@@ -100,10 +107,11 @@ function ControlLayer(props: IControlLayerProps) {
     const onVideoSeek = useCallback(debounce((to) => {
         setSliding(false);
 
-        /*
-        dispatch(WatchRequireSeek(true, to));
-        dispatch(WatchSetProgress(to));*/
-    }, 500), []);
+        if(!allowControl) return;
+
+        dispatch(WatchSetPlayerProgress(to));
+        props.refPlayer.current.seekTo(to);
+    }, 500), [allowControl]);
 
     return (
         <div className='absolute left-0 top-0 w-full h-full'>

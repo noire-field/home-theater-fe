@@ -1,7 +1,7 @@
 import io, { Socket } from "socket.io-client";
 
 import { store } from './../store';
-import { IViewer, WatchSetSocketConnected, WatchSetViewers, WatchSetStartTime } from "../Watch.slice";
+import { IViewer, WatchSetSocketConnected, WatchSetViewers, WatchSetStartTime, WatchStatus, WatchPrepareToWatch, IPrepareToWatch } from "../Watch.slice";
 
 class AppSocket {
     private established: boolean;
@@ -21,6 +21,7 @@ class AppSocket {
         // Custom Handlers
         this.client.on('UpdateViewers', this.OnUpdateViewers);
         this.client.on('UpdateStartTime', this.OnUpdateStartTime);
+        this.client.on('PrepareToWatch', this.OnPrepareToWatch);
     }
 
     GetClient(): Socket {
@@ -54,6 +55,10 @@ class AppSocket {
 
     OnUpdateStartTime(newStartTime: number) {
         store.dispatch(WatchSetStartTime(newStartTime));
+    }
+
+    OnPrepareToWatch(res: IPrepareToWatch) {
+        store.dispatch(WatchPrepareToWatch(res));
     }
 }
 

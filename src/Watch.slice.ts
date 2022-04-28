@@ -1,5 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export interface IPrepareToWatch {
+    videoUrl: string;
+    watchStatus: WatchStatus
+}
+
+export enum WatchStatus {
+    WATCH_WAITING = 0,
+    WATCH_INIT = 1,
+    WATCH_ONLINE = 2,
+    WATCH_FINISHED = 3
+}
+
 export interface IViewer {
     friendlyName: string;
     level: number;
@@ -22,7 +34,7 @@ export interface WatchState {
     passCode: string;
     joinedRoom: boolean;
     socketConnected: boolean;
-
+    status: WatchStatus;
     show: {
         title: string;
         realStartTime: string;
@@ -30,6 +42,8 @@ export interface WatchState {
     };
     viewers: IViewer[];
     player: {
+        allowControl: boolean;
+        videoUrl: string;
         isBuffering: boolean;
         isPlaying: boolean;
         progress: number;
@@ -44,6 +58,7 @@ const initialState: WatchState = {
     passCode: '',
     joinedRoom: false,
     socketConnected: false,
+    status: WatchStatus.WATCH_WAITING,
     show: {
         title: '',
         realStartTime: '0',
@@ -51,6 +66,8 @@ const initialState: WatchState = {
     },
     viewers: [],
     player: {
+        allowControl: false,
+        videoUrl: '',
         isBuffering: false,
         isPlaying: false,
         progress: 0.0,
@@ -89,13 +106,18 @@ export const WatchSlice = createSlice({
         WatchSetPlayerVolume(state, action: PayloadAction<number>) { state.player.volume = action.payload },
         WatchSetPlayerMuted(state, action: PayloadAction<boolean>) { state.player.muted = action.payload },
         WatchSetPlayerFullScreen(state, action: PayloadAction<boolean>) { state.player.isFullScreen = action.payload },
-
+        WatchSetPlayerAllowControl(state, action: PayloadAction<boolean>) { state.player.allowControl = action.payload },
+        WatchPrepareToWatch(state, action: PayloadAction<IPrepareToWatch>) { 
+            state.status = action.payload.watchStatus;
+            state.player.videoUrl = action.payload.videoUrl;
+        }
     }
 });
 
 export const { 
     WatchSetSocketConnected, WatchSetJoined, WatchSetSubtitle, WatchSetViewers, WatchSetStartTime,
-    WatchSetPlayerBuffering, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetPlayerMuted, WatchSetPlayerFullScreen
+    WatchSetPlayerBuffering, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetPlayerMuted, 
+    WatchSetPlayerFullScreen, WatchSetPlayerAllowControl, WatchPrepareToWatch
 } = WatchSlice.actions;
 
 // Export

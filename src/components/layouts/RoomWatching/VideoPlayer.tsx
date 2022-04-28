@@ -1,24 +1,23 @@
-import React, { useEffect, useRef } from 'react';
+import React, { LegacyRef, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player';
 import { useSelector } from 'react-redux';
 import { RootState, useAllDispatch } from '../../../store';
 import { WatchSetPlayerBuffering, WatchSetPlayerPlaying, WatchSetPlayerProgress } from '../../../Watch.slice';
 
-function VideoPlayer() {
-    const dispatch = useAllDispatch();
+interface IVideoPlayerProps {
+    
+}
 
-    const refPlayer = useRef<ReactPlayer>(null);
+function VideoPlayer(props: IVideoPlayerProps, ref: any) {
+    const dispatch = useAllDispatch();
+    
     const volume = useSelector((state: RootState) => state.watch.player.volume)
     const muted = useSelector((state: RootState) => state.watch.player.muted)
     const isPlaying = useSelector((state: RootState) => state.watch.player.isPlaying);
-    const videoUrl = 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4';
+    const videoUrl = useSelector((state: RootState) => state.watch.player.videoUrl);
 
     if(process.env.NODE_ENV === 'development')
         console.log(`App >> WatchingRoom > RoomWatching > (1)VideoPlayer: Render`);
-
-    const onToggleFullScreen = () => {
-        alert('Go Full')
-    }
 
     /*
     const onStart = () => {
@@ -42,27 +41,13 @@ function VideoPlayer() {
         dispatch(WatchSetPlayerBuffering(false));
     }
     const onEnded = () => { 
-        console.log('OnEnded')
+        dispatch(WatchSetPlayerPlaying(false));
     }
 
-    useEffect(() => {
-       //dispatch(WatchSetPlayerPlaying(true));
-    }, [])
-
-    useEffect(() => {
-        /*
-        const timer = setTimeout(() => {
-            dispatch(WatchSetPlayerPlaying(!isPlaying));
-        }, 3000);
-        return () => {
-            clearTimeout(timer);
-        }*/
-    });
-
     return (
-        <div onDoubleClick={onToggleFullScreen} className='h-full'>
+        <div className='h-full'>
             <ReactPlayer 
-                ref={refPlayer}
+                ref={ref}
                 style={{ margin: 0, padding: 0, position: 'relative' }} height='100%' width='100%' 
                 /*onPlay={onPlay} onStart={onStart} onPause={onPause} */onProgress={onProgress}  onBuffer={onBuffer} onBufferEnd={onBufferEnd} onEnded={onEnded}
                 playing={isPlaying} volume={muted ? 0.0 : volume}
@@ -72,4 +57,4 @@ function VideoPlayer() {
     )
 }
 
-export default React.memo(VideoPlayer);
+export default React.memo(React.forwardRef(VideoPlayer));

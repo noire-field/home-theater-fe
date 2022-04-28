@@ -13,6 +13,9 @@ function RoomWaiting() {
     const dispatch = useAllDispatch();
     const { t } = useTranslation();
 
+    const loggedIn = useSelector((state: RootState) => state.user.loggedIn);
+    const isAdmin = useSelector((state: RootState) => state.user.isAdmin);
+
     const showTitle = useSelector((state: RootState) => state.watch.show.title);
     const viewers = useSelector((state: RootState) => state.watch.viewers);
     const passCode = useSelector((state: RootState) => state.watch.passCode);
@@ -26,6 +29,18 @@ function RoomWaiting() {
         AppAPI.patch(`/watch/room/${passCode}/add-wait-time`, { 
             minuteAmount: 5
         }).then((res: AxiosResponse) => {
+            if(res.status === 200) { }
+        }).catch((res: AxiosError) => {
+
+        }).finally(() => {
+            dispatch(AppSetLoading(false));
+        });
+    }
+
+    const onClickStartNow = () => {
+        dispatch(AppSetLoading(true));
+
+        AppAPI.patch(`/watch/room/${passCode}/start-now`, { }).then((res: AxiosResponse) => {
             if(res.status === 200) { }
         }).catch((res: AxiosError) => {
 
@@ -51,9 +66,11 @@ function RoomWaiting() {
                     </p> }
                 </div>
                 <div className='flex flex-row justify-center pt-0 md:pt-5'>
+                { (loggedIn && isAdmin) && <React.Fragment>
                     <button className='btn btn-blue h-15 leading-4 md:h-10 mr-2'><i className="fa-solid fa-eye mr-1"></i>{ t('Action:PreviewMovie') }</button>
                     <button onClick={onClickAddMoreTime} className='btn btn-blue h-15 leading-4 md:h-10 mr-2'><i className="fa-solid fa-clock-rotate-left mr-1"></i>{ t('Action:AddWaitTime') }</button>
-                    <button className='btn btn-pink h-15 leading-4 md:h-10'><i className="fa-solid fa-circle-play mr-1"></i>{ t('Action:StartNow') }</button>
+                    <button onClick={onClickStartNow} className='btn btn-pink h-15 leading-4 md:h-10'><i className="fa-solid fa-circle-play mr-1"></i>{ t('Action:StartNow') }</button>
+                </React.Fragment> }
                 </div>
             </div>
         </div>

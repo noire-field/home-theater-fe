@@ -7,7 +7,7 @@ import RoomWatching from './RoomWatching';
 
 import { RootState, useAllDispatch } from '../store';
 import { AppSetLoading } from '../App.slice';
-import { WatchSetJoined, WatchSetSubtitle } from '../Watch.slice';
+import { WatchSetJoined, WatchSetSubtitle, WatchStatus } from '../Watch.slice';
 
 import { AppAPI, AxiosError, AxiosResponse } from '../utils/api';
 import AppSocket from '../utils/socket';
@@ -17,7 +17,7 @@ function WatchingRoom() {
     let { passCode } = useParams();
     const joinedRoom = useSelector((state: RootState) => state.watch.joinedRoom);
     const socketConnected = useSelector((state: RootState) => state.watch.socketConnected);
-    //const watching = useSelector((state: RootState) => state.watch.)
+    const status = useSelector((state: RootState) => state.watch.status)
     
     if(process.env.NODE_ENV === 'development')
         console.log(`App >> WatchingRoom: Render (PassCode: ${passCode})`);
@@ -64,11 +64,17 @@ function WatchingRoom() {
 
     if(!joinedRoom) return null;
 
-    return (
-        <React.Fragment>
-            <RoomWatching/>
-        </React.Fragment>
-    )
+    var renderContent = null;
+
+    switch(status) {
+        case WatchStatus.WATCH_WAITING: renderContent = <RoomWaiting/>; break;
+        case WatchStatus.WATCH_INIT:
+        case WatchStatus.WATCH_ONLINE: 
+            renderContent = <RoomWatching/>; break;
+        //case WatchStatus.WATCH_FINISHED: renderContent = <div>Finished</div>; break;
+    }
+
+    return renderContent;
 }
 
 export default React.memo(WatchingRoom);

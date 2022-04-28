@@ -1,23 +1,27 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import BufferingLayer from '../components/layouts/RoomWatching/BufferingLayer';
 import ControlLayer from '../components/layouts/RoomWatching/ControlLayer';
 import VideoPlayer from '../components/layouts/RoomWatching/VideoPlayer';
 
-import { useAllDispatch } from '../store';
-import { WatchSetPlayerFullScreen } from '../Watch.slice';
+import { RootState, useAllDispatch } from '../store';
+import { WatchSetPlayerAllowControl, WatchSetPlayerFullScreen } from '../Watch.slice';
 
 function RoomWatching() {
     const dispatch = useAllDispatch();
-
     
-    
+    const loggedIn = useSelector((state: RootState) => state.user.loggedIn);
+    const isAdmin = useSelector((state: RootState) => state.user.isAdmin);
+    const allowControl = useSelector((state: RootState) => state.watch.player.allowControl);
     const [showControls, setShowControls] = useState(true);
 
+    const refPlayer = React.createRef();
+
     // A little hack :)
-    const refPlayPause = useRef();
-    const refBackward = useRef();
-    const refForward = useRef();
+    const refPlayPause = useRef<HTMLDivElement>(null);
+    const refBackward = useRef<HTMLDivElement>(null);
+    const refForward = useRef<HTMLDivElement>(null);
 
     /*useEffect(() => {
         const onMouseAction = () => {
@@ -39,36 +43,40 @@ function RoomWatching() {
     }, [showControls])*/
 
     useEffect(() => {
+        // @ts-ignore
         document.addEventListener('keydown', onKeyboardPress);
         document.addEventListener('fullscreenchange', onFullScreenChange);
 
         return () => {
+            // @ts-ignore
             document.removeEventListener('keydown', onKeyboardPress);
             document.removeEventListener('fullscreenchange', onFullScreenChange);
         }
-    }, [showControls]);
+    }, [showControls, allowControl]);
 
-    const onKeyboardPress = (e) => {
+    const onKeyboardPress = (e: KeyboardEvent) => {
+        if(!allowControl) return;
+
         switch(e.code) {
             case 'Enter':
             case 'Space':
                 if(!showControls) setShowControls(true);
-                else refPlayPause.current.click();
+                else if(refPlayPause.current) refPlayPause.current.click();
                 break;
             case 'ArrowLeft':
                 if(!showControls) setShowControls(true);
-                else refBackward.current.click();
+                else if(refBackward.current) refBackward.current.click();
                 break;
             case 'ArrowRight':
                 if(!showControls) setShowControls(true);
-                else refForward.current.click();
+                else if(refForward.current) refForward.current.click();
                 break;
             default:
                 break;
         }
     }
 
-    const onFullScreenChange = (e) => {
+    const onFullScreenChange = () => {
         if (document.fullscreenElement) {
             dispatch(WatchSetPlayerFullScreen(true));
         } else {
@@ -76,13 +84,19 @@ function RoomWatching() {
         }
     }
 
+    useEffect(() => {
+        if(!loggedIn || !isAdmin)
+            return;
+
+        dispatch(WatchSetPlayerAllowControl(true));
+    }, [loggedIn, isAdmin]);
 
     return (
         <div className='watching-room simple-fade-in'>
             <div className="wrapper">
-                <VideoPlayer/>
+                <VideoPlayer ref={refPlayer}/>
                 <BufferingLayer/>
-                <ControlLayer refPlayPause={refPlayPause} refBackward={refBackward} refForward={refForward}/>
+                <ControlLayer refPlayer={refPlayer} refPlayPause={refPlayPause} refBackward={refBackward} refForward={refForward}/>
             </div>
         </div>
     )
