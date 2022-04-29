@@ -6,13 +6,15 @@ import ControlLayer from '../components/layouts/RoomWatching/ControlLayer';
 import VideoPlayer from '../components/layouts/RoomWatching/VideoPlayer';
 
 import { RootState, useAllDispatch } from '../store';
-import { WatchSetPlayerAllowControl, WatchSetPlayerFullScreen } from '../Watch.slice';
+import { WatchSetPlayerAllowControl, WatchSetPlayerFullScreen, WatchStatus } from '../Watch.slice';
 
 function RoomWatching() {
     const dispatch = useAllDispatch();
     
     const loggedIn = useSelector((state: RootState) => state.user.loggedIn);
     const isAdmin = useSelector((state: RootState) => state.user.isAdmin);
+
+    const watchStatus = useSelector((state: RootState) => state.watch.status);
     const allowControl = useSelector((state: RootState) => state.watch.player.allowControl);
     const [showControls, setShowControls] = useState(true);
 
@@ -92,7 +94,7 @@ function RoomWatching() {
     }, [loggedIn, isAdmin]);
 
     return (
-        <div className='watching-room simple-fade-in'>
+        <div className='watching-room simple-fade-in' style={watchStatus == WatchStatus.WATCH_INIT ? { position: 'fixed', left: '99999px', opacity: 0 } : { }}>
             <div className="wrapper">
                 <VideoPlayer ref={refPlayer}/>
                 <BufferingLayer/>

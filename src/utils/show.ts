@@ -38,3 +38,19 @@ export const IsStartTimeValid = (rawTime: string): { valid: boolean, time?: Date
 
     return { valid: true, time: parsedTime }
 }
+
+export const CalculateSeekTime = (progress: number, progressAtTime: number) => {
+    const currentTime = new Date().getTime();
+    const targetTime = progressAtTime;
+    var diffTime = 0.0;
+
+    if(targetTime > currentTime) { // Future
+        diffTime = (targetTime - currentTime) / 1000;
+        return progress - diffTime;
+    } else if(currentTime > targetTime) { // Past
+        diffTime = (currentTime - targetTime) / 1000;
+        return progress + diffTime;
+    }
+
+    return progress; // No change
+}

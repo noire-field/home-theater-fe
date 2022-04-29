@@ -1,8 +1,21 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export interface IRequireSeek {
+    on: boolean;
+    to: number;
+}
+
 export interface IPrepareToWatch {
     videoUrl: string;
-    watchStatus: WatchStatus
+    watchStatus: WatchStatus;
+}
+
+export interface IStartWatching {
+    videoUrl: string;
+    watchStatus: WatchStatus;
+    playing: boolean;
+    progress: number;
+    progressAtTime: number;
 }
 
 export enum WatchStatus {
@@ -51,6 +64,10 @@ export interface WatchState {
         volume: number;
         muted: boolean;
         isFullScreen: boolean;
+    },
+    requireSeek: {
+        on: boolean;
+        to: number;
     }
 }
 
@@ -75,6 +92,10 @@ const initialState: WatchState = {
         volume: 0.0,
         muted: false,
         isFullScreen: false
+    },
+    requireSeek: {
+        on: false,
+        to: 0.0
     }
 }
 
@@ -110,6 +131,16 @@ export const WatchSlice = createSlice({
         WatchPrepareToWatch(state, action: PayloadAction<IPrepareToWatch>) { 
             state.status = action.payload.watchStatus;
             state.player.videoUrl = action.payload.videoUrl;
+        },
+        WatchStart(state, action: PayloadAction<IStartWatching>) {
+            state.status = action.payload.watchStatus;
+            if(state.player.videoUrl !== action.payload.videoUrl) state.player.videoUrl = action.payload.videoUrl;
+
+            state.player.progress = 0.0;
+            state.player.isPlaying = action.payload.playing;
+        },
+        WatchRequireSeek(state, action: PayloadAction<IRequireSeek>) {
+            state.requireSeek = action.payload;
         }
     }
 });
@@ -117,7 +148,7 @@ export const WatchSlice = createSlice({
 export const { 
     WatchSetSocketConnected, WatchSetJoined, WatchSetSubtitle, WatchSetViewers, WatchSetStartTime,
     WatchSetPlayerBuffering, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetPlayerMuted, 
-    WatchSetPlayerFullScreen, WatchSetPlayerAllowControl, WatchPrepareToWatch
+    WatchSetPlayerFullScreen, WatchSetPlayerAllowControl, WatchPrepareToWatch, WatchStart, WatchRequireSeek
 } = WatchSlice.actions;
 
 // Export

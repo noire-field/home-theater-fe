@@ -23,6 +23,7 @@ function WatchingRoom() {
         console.log(`App >> WatchingRoom: Render (PassCode: ${passCode})`);
 
     useEffect(() => {
+        if(!passCode) return;
         if(joinedRoom) {
             if(process.env.NODE_ENV === 'development')
                 console.log(`App >> WatchingRoom: Room Joined`);
@@ -38,6 +39,7 @@ function WatchingRoom() {
     }, [passCode, joinedRoom]);
 
     useEffect(() => {
+        if(!passCode) return;
         if(!socketConnected) return;
 
         const socketId = AppSocket.GetClient().id;
@@ -52,6 +54,8 @@ function WatchingRoom() {
             withSubtitle: true
         }).then((res: AxiosResponse) => {
             if(res.status === 200) {
+                // @ts-ignore
+                AppSocket.OnRoomJoined(passCode);
                 dispatch(WatchSetJoined({ passCode: passCode || '', showTitle: res.data.showTitle, realStartTime: res.data.realStartTime }));
                 if(res.data.subtitles) dispatch(WatchSetSubtitle(res.data.subtitles));
             }
@@ -60,7 +64,7 @@ function WatchingRoom() {
         }).finally(() => {
             dispatch(AppSetLoading(false));
         });
-    }, [socketConnected]);
+    }, [passCode, socketConnected]);
 
     if(!joinedRoom) return null;
 
@@ -68,9 +72,8 @@ function WatchingRoom() {
 
     switch(status) {
         case WatchStatus.WATCH_WAITING: renderContent = <RoomWaiting/>; break;
-        case WatchStatus.WATCH_INIT:
-        case WatchStatus.WATCH_ONLINE: 
-            renderContent = <RoomWatching/>; break;
+        case WatchStatus.WATCH_INIT: renderContent = <React.Fragment><RoomWatching/><RoomWaiting/></React.Fragment>; break;
+        case WatchStatus.WATCH_ONLINE: renderContent = <RoomWatching/>; break;
         //case WatchStatus.WATCH_FINISHED: renderContent = <div>Finished</div>; break;
     }
 

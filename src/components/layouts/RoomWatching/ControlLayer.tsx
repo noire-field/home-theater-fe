@@ -1,4 +1,4 @@
-import React, { LegacyRef, useCallback, useState } from 'react';
+import React, { LegacyRef, useCallback, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash.debounce';
@@ -11,9 +11,10 @@ import { red } from '@mui/material/colors';
 import Slider from '@mui/material/Slider'
 
 import { RootState, useAllDispatch } from '../../../store';
-import { WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume } from '../../../Watch.slice';
+import { WatchRequireSeek, WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume } from '../../../Watch.slice';
 
 import { DurationSecondToText } from '../../../utils/show';
+import AppSocket from '../../../utils/socket';
 
 const theme = createTheme({
     palette: {
@@ -36,6 +37,7 @@ function ControlLayer(props: IControlLayerProps) {
     const videoProgress = useSelector((state: RootState) => state.watch.player.progress);
     const videoDuration = useSelector((state: RootState) => state.watch.player.duration);
     const allowControl = useSelector((state: RootState) => state.watch.player.allowControl);
+    const requireSeek = useSelector((state: RootState) => state.watch.requireSeek);
 
     const isPlaying = useSelector((state: RootState) => state.watch.player.isPlaying);
     const isFullScreen = useSelector((state: RootState) => state.watch.player.isFullScreen);
@@ -63,9 +65,13 @@ function ControlLayer(props: IControlLayerProps) {
     const onClickPlayPause = () => {
         if(!allowControl) return;
 
-        dispatch(WatchSetPlayerPlaying(!isPlaying));
         if(isPlaying) { // Stop
+            dispatch(WatchSetPlayerPlaying(false));
             dispatch(WatchSetPlayerBuffering(false));
+            AppSocket.PauseShow();
+        } else {
+            //dispatch(WatchSetPlayerPlaying(true));
+            AppSocket.ResumeShow();
         }
     }
 
@@ -110,8 +116,19 @@ function ControlLayer(props: IControlLayerProps) {
         if(!allowControl) return;
 
         dispatch(WatchSetPlayerProgress(to));
-        props.refPlayer.current.seekTo(to);
+        props.refPlayer.current.seekTo(to, 'seconds');
+
+        //if(sliding) 
     }, 500), [allowControl]);
+
+    useEffect(() => {
+        if(!requireSeek.on) return;
+
+        dispatch(WatchSetPlayerProgress(requireSeek.to));
+        props.refPlayer.current.seekTo(requireSeek.to, 'seconds');
+
+        dispatch(WatchRequireSeek({ on: false, to: 0.0 }));
+    }, [requireSeek.on, requireSeek.to])
 
     return (
         <div className='absolute left-0 top-0 w-full h-full'>
