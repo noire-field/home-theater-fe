@@ -118,8 +118,8 @@ function ControlLayer(props: IControlLayerProps) {
         dispatch(WatchSetPlayerProgress(to));
         props.refPlayer.current.seekTo(to, 'seconds');
 
-        //if(sliding) 
-    }, 500), [allowControl]);
+        AppSocket.SlideShow(to);
+    }, 500), [allowControl, props.refPlayer]);
 
     useEffect(() => {
         if(!requireSeek.on) return;

@@ -1,7 +1,7 @@
 import io, { Socket } from "socket.io-client";
 
 import { store } from './../store';
-import { IViewer, WatchSetSocketConnected, WatchSetPlayerBuffering, WatchSetViewers, WatchSetStartTime, WatchPrepareToWatch, IPrepareToWatch, IStartWatching, WatchStart, WatchRequireSeek, WatchSetPlayerPlaying, WatchSetPlayerProgress } from "../Watch.slice";
+import { IViewer, WatchSetSocketConnected, WatchSetPlayerBuffering, WatchSetViewers, WatchSetStartTime, WatchPrepareToWatch, IPrepareToWatch, IStartWatching, WatchStart, WatchRequireSeek, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchStatus, IFinishWatch, WatchFinish } from "../Watch.slice";
 import { CalculateSeekTime } from "./show";
 
 class AppSocket {
@@ -27,6 +27,8 @@ class AppSocket {
         this.client.on('PrepareToWatch', this.OnPrepareToWatch);
         this.client.on('StartWatching', this.OnStartWatching);
         this.client.on('VideoAction', this.OnVideoAction);
+        this.client.on('FinishWatching', this.OnFinishWatching);
+        this.client.on('KickUserOut', this.OnKickUserOut);
     }
 
     GetClient(): Socket {
@@ -42,12 +44,25 @@ class AppSocket {
         return true;
     }
 
+    Disconnect(): boolean {
+        if(!this.established) return false;
+
+        this.client.disconnect();
+        this.established = false;
+
+        return true;
+    }
+
     PauseShow(): void {
         this.client.emit('VideoAction', { passCode: this.passCode, action: 'Pause' });
     }
 
     ResumeShow(): void {
         this.client.emit('VideoAction', { passCode: this.passCode, action: 'Resume' });
+    }
+
+    SlideShow(to: number): void {
+        this.client.emit('VideoAction', { passCode: this.passCode, action: 'Slide', to, sendTime: new Date().getTime() });
     }
 
     // Built-In Handler
@@ -110,7 +125,23 @@ class AppSocket {
                 store.dispatch(WatchSetStartTime(res.data.realStartTime));
                 
                 break;
+            case 'Slide':
+                const currentTime = new Date().getTime()
+                const correctProgress = res.data.progress + ((currentTime - res.data.sendTime) / 1000);
+
+                store.dispatch(WatchRequireSeek({ on: true, to: correctProgress }));
+                store.dispatch(WatchSetStartTime(res.data.realStartTime));
+                
+                break;
         }
+    }
+
+    OnFinishWatching(res: IFinishWatch) {
+        store.dispatch(WatchFinish(res));
+    }
+
+    OnKickUserOut() {
+
     }
 }
 

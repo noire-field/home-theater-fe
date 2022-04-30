@@ -1,5 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export enum ShowStatus {
+    Processing = 0,
+    Scheduled = 1,
+    Watching = 2,
+    Finished = 3,
+    Cancelled = 4,
+    Error = 5,
+}
+
 export interface MovieShow {
     id: number;
     passCode: string;
@@ -10,7 +19,7 @@ export interface MovieShow {
     duration: number;
     smartSync: number;
     votingControl: number;
-    status: number;
+    status: ShowStatus;
     finishedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;

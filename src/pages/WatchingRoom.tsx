@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import RoomWaiting from './RoomWaiting';
 import RoomWatching from './RoomWatching';
@@ -14,6 +14,7 @@ import AppSocket from '../utils/socket';
 
 function WatchingRoom() {
     const dispatch = useAllDispatch();
+    const navigate = useNavigate();
     let { passCode } = useParams();
     const joinedRoom = useSelector((state: RootState) => state.watch.joinedRoom);
     const socketConnected = useSelector((state: RootState) => state.watch.socketConnected);
@@ -66,6 +67,14 @@ function WatchingRoom() {
         });
     }, [passCode, socketConnected]);
 
+    useEffect(() => {
+        if(status !== WatchStatus.WATCH_FINISHED)
+            return;
+
+        AppSocket.Disconnect();
+        navigate('/finished', { replace: true });
+    }, [status])
+
     if(!joinedRoom) return null;
 
     var renderContent = null;
@@ -74,7 +83,6 @@ function WatchingRoom() {
         case WatchStatus.WATCH_WAITING: renderContent = <RoomWaiting/>; break;
         case WatchStatus.WATCH_INIT: renderContent = <React.Fragment><RoomWatching/><RoomWaiting/></React.Fragment>; break;
         case WatchStatus.WATCH_ONLINE: renderContent = <RoomWatching/>; break;
-        //case WatchStatus.WATCH_FINISHED: renderContent = <div>Finished</div>; break;
     }
 
     return renderContent;
