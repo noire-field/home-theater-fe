@@ -44,10 +44,18 @@ export interface ISubtitleLine {
     text: string;
 }
 
+export interface ISubtitleParsed {
+    id: number;
+    startTime: number;
+    endTime: number;
+    text: string;
+}
+
 export interface ISetJoinedState {
     passCode: string;
     showTitle: string;
     realStartTime: string;
+    smartSync: number;
 }
 
 export interface WatchState {
@@ -58,11 +66,13 @@ export interface WatchState {
     show: {
         title: string;
         realStartTime: string;
-        subtitles: ISubtitleLine[];
+        subtitles: ISubtitleParsed[];
         finishedAt: number;
+        smartSync: number;
     };
     viewers: IViewer[];
     player: {
+        showControl: boolean;
         allowControl: boolean;
         videoUrl: string;
         isBuffering: boolean;
@@ -72,6 +82,7 @@ export interface WatchState {
         volume: number;
         muted: boolean;
         isFullScreen: boolean;
+        playbackRate: number;
     },
     requireSeek: {
         on: boolean;
@@ -88,10 +99,12 @@ const initialState: WatchState = {
         title: '',
         realStartTime: '0',
         subtitles: [],
-        finishedAt: 0
+        finishedAt: 0,
+        smartSync: 0
     },
     viewers: [],
     player: {
+        showControl: false,
         allowControl: false,
         videoUrl: '',
         isBuffering: false,
@@ -100,7 +113,8 @@ const initialState: WatchState = {
         duration: 125.933333,
         volume: 0.0,
         muted: false,
-        isFullScreen: false
+        isFullScreen: false,
+        playbackRate: 1.00
     },
     requireSeek: {
         on: false,
@@ -120,8 +134,9 @@ export const WatchSlice = createSlice({
             state.passCode = action.payload.passCode;
             state.show.title = action.payload.showTitle;
             state.show.realStartTime = action.payload.realStartTime;
+            state.show.smartSync = action.payload.smartSync;
         },
-        WatchSetSubtitle(state, action: PayloadAction<ISubtitleLine[]>) {
+        WatchSetSubtitle(state, action: PayloadAction<ISubtitleParsed[]>) {
             state.show.subtitles = action.payload;
         },
         WatchSetViewers(state, action: PayloadAction<IViewer[]>) {
@@ -130,11 +145,16 @@ export const WatchSlice = createSlice({
         WatchSetStartTime(state, action: PayloadAction<number>) {
             state.show.realStartTime = new Date(action.payload).toString();
         },
+        WatchSetPlaybackRate(state, action: PayloadAction<number>) {
+            state.player.playbackRate = action.payload;
+        },
+        WatchSetStatus(state, action: PayloadAction<WatchStatus>) { state.status = action.payload },
         WatchSetPlayerBuffering(state, action: PayloadAction<boolean>) { state.player.isBuffering = action.payload },
         WatchSetPlayerPlaying(state, action: PayloadAction<boolean>) { state.player.isPlaying = action.payload },
         WatchSetPlayerProgress(state, action: PayloadAction<number>) { state.player.progress = action.payload },
         WatchSetPlayerVolume(state, action: PayloadAction<number>) { state.player.volume = action.payload },
         WatchSetPlayerMuted(state, action: PayloadAction<boolean>) { state.player.muted = action.payload },
+        WatchSetShowControl(state, action: PayloadAction<boolean>) { state.player.showControl = action.payload },
         WatchSetPlayerFullScreen(state, action: PayloadAction<boolean>) { state.player.isFullScreen = action.payload },
         WatchSetPlayerAllowControl(state, action: PayloadAction<boolean>) { state.player.allowControl = action.payload },
         WatchPrepareToWatch(state, action: PayloadAction<IPrepareToWatch>) { 
@@ -158,23 +178,14 @@ export const WatchSlice = createSlice({
             state.show.finishedAt = action.payload.finishedAt;
             state.viewers = [];
             state.player.volume = 0.0;
-            /*
-            state = { 
-                ...initialState, 
-                socketConnected: true,
-                status: action.payload.watchStatus,
-                show: {
-                    ...initialState.show,
-                    finishedAt: action.payload.finishedAt
-                }
-            }; // Keep the socket connected*/
+            state.show.subtitles = [];
         }
     }
 });
 
 export const { 
-    WatchSetSocketConnected, WatchSetJoined, WatchSetSubtitle, WatchSetViewers, WatchSetStartTime,
-    WatchSetPlayerBuffering, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetPlayerMuted, 
+    WatchSetSocketConnected, WatchSetJoined, WatchSetSubtitle, WatchSetViewers, WatchSetStartTime, WatchSetStatus, WatchSetPlaybackRate,
+    WatchSetPlayerBuffering, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetPlayerMuted, WatchSetShowControl,
     WatchSetPlayerFullScreen, WatchSetPlayerAllowControl, WatchPrepareToWatch, WatchStart, WatchRequireSeek, WatchFinish
 } = WatchSlice.actions;
 

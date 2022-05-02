@@ -18,6 +18,15 @@ const Watch = {
         "JoiningRoom": "Joining Room",
         "WeFoundRoom": "We found a room that matches your code!",
         "WhyFriendlyName": "This will help friends in room to recognize you easily."
+    },
+    "Finished": {
+        "TheEnd": "The End",
+        "HopeYouLikeIt": "The show has ended, we hope you like it!"
+    },
+    "SmartSync": {
+        "Syncing": "SmartSync is syncing...",
+        "Delay": "Delay",
+        "Rate": "Rate"
     }
 }
 
@@ -32,7 +41,8 @@ const Action = {
     "JoinRoom": "Join Room",
     "PreviewMovie": "Preview Movie",
     "AddWaitTime": "More 5 Minutes Wait",
-    "StartNow": "Start Now"
+    "StartNow": "Start Now",
+    "ReturnHomepage": "Return To Homepage"
 }
 
 const Field = {

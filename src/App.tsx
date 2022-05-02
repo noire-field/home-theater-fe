@@ -15,6 +15,7 @@ import AdminLogin from './pages/AdminLogin';
 import WatchingRoom from './pages/WatchingRoom';
 
 import LoadingOverlay from './components/LoadingOverlay';
+import FinishedWatching from './pages/FinishedWatching';
 
 function App() {
 	const dispatch = useAllDispatch();
@@ -63,6 +64,7 @@ function App() {
 					<Route path="/manage-room" element={<ManageRoom />}/>
 					<Route path="/admin-login" element={<AdminLogin />}/>
 					<Route path="/watch/:passCode" element={<WatchingRoom />}/>
+					<Route path="/finished" element={<FinishedWatching />}/>
 				</Routes> 
 			}
             <CSSTransition in={loading} timeout={250} classNames="anim-fading" unmountOnExit>

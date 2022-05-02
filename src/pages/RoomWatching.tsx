@@ -1,12 +1,15 @@
-import React, { KeyboardEvent, useEffect, useRef, useState } from 'react';
+import React, { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { CSSTransition } from 'react-transition-group';
+import debounce from 'lodash.debounce';
 
 import BufferingLayer from '../components/layouts/RoomWatching/BufferingLayer';
 import ControlLayer from '../components/layouts/RoomWatching/ControlLayer';
 import VideoPlayer from '../components/layouts/RoomWatching/VideoPlayer';
+import SubtitleViewer from '../components/layouts/RoomWatching/SubtitleViewer';
 
 import { RootState, useAllDispatch } from '../store';
-import { WatchSetPlayerAllowControl, WatchSetPlayerFullScreen, WatchStatus } from '../Watch.slice';
+import { WatchSetPlayerAllowControl, WatchSetPlayerFullScreen, WatchSetShowControl, WatchStatus } from '../Watch.slice';
 
 function RoomWatching() {
     const dispatch = useAllDispatch();
@@ -16,7 +19,7 @@ function RoomWatching() {
 
     const watchStatus = useSelector((state: RootState) => state.watch.status);
     const allowControl = useSelector((state: RootState) => state.watch.player.allowControl);
-    const [showControls, setShowControls] = useState(true);
+    const showControl = useSelector((state: RootState) => state.watch.player.showControl);
 
     const refPlayer = React.createRef();
 
@@ -25,36 +28,32 @@ function RoomWatching() {
     const refBackward = useRef<HTMLDivElement>(null);
     const refForward = useRef<HTMLDivElement>(null);
 
-    /*useEffect(() => {
+    useEffect(() => {
         const onMouseAction = () => {
-            //if(!showControls) setShowControls(true);
-            //hideControls();
+            if(!showControl) dispatch(WatchSetShowControl(true));
+            hideControls();
         }
 
+        // @ts-ignore
+        document.addEventListener('keydown', onKeyboardPress);
+        document.addEventListener('fullscreenchange', onFullScreenChange);
         document.addEventListener('mousemove', onMouseAction);
         document.addEventListener('click', onMouseAction);
-        
 
         return () => {
             hideControls.cancel();
 
-            document.removeEventListener('mousemove', onMouseAction);
-            document.removeEventListener('click', onMouseAction);
-        }
-    // eslint-disable-next-line
-    }, [showControls])*/
-
-    useEffect(() => {
-        // @ts-ignore
-        document.addEventListener('keydown', onKeyboardPress);
-        document.addEventListener('fullscreenchange', onFullScreenChange);
-
-        return () => {
             // @ts-ignore
             document.removeEventListener('keydown', onKeyboardPress);
             document.removeEventListener('fullscreenchange', onFullScreenChange);
+            document.removeEventListener('mousemove', onMouseAction);
+            document.removeEventListener('click', onMouseAction);
         }
-    }, [showControls, allowControl]);
+    }, [showControl, allowControl]);
+
+    const hideControls = useCallback(debounce(() => { 
+        dispatch(WatchSetShowControl(false));
+    }, 3000), [])
 
     const onKeyboardPress = (e: KeyboardEvent) => {
         if(!allowControl) return;
@@ -62,16 +61,16 @@ function RoomWatching() {
         switch(e.code) {
             case 'Enter':
             case 'Space':
-                if(!showControls) setShowControls(true);
-                else if(refPlayPause.current) refPlayPause.current.click();
+                if(!showControl) dispatch(WatchSetShowControl(true));
+                if(refPlayPause.current) refPlayPause.current.click();
                 break;
             case 'ArrowLeft':
-                if(!showControls) setShowControls(true);
-                else if(refBackward.current) refBackward.current.click();
+                if(!showControl) dispatch(WatchSetShowControl(true));
+                if(refBackward.current) refBackward.current.click();
                 break;
             case 'ArrowRight':
-                if(!showControls) setShowControls(true);
-                else if(refForward.current) refForward.current.click();
+                if(!showControl) dispatch(WatchSetShowControl(true));
+                if(refForward.current) refForward.current.click();
                 break;
             default:
                 break;
@@ -93,12 +92,22 @@ function RoomWatching() {
         dispatch(WatchSetPlayerAllowControl(true));
     }, [loggedIn, isAdmin]);
 
+    useEffect(() => {
+        if(watchStatus == WatchStatus.WATCH_ONLINE) {
+            dispatch(WatchSetShowControl(true));
+            setTimeout(hideControls, 500);
+        }
+    }, [watchStatus]);
+
     return (
         <div className='watching-room simple-fade-in' style={watchStatus == WatchStatus.WATCH_INIT ? { position: 'fixed', left: '99999px', opacity: 0 } : { }}>
             <div className="wrapper">
                 <VideoPlayer ref={refPlayer}/>
+                <SubtitleViewer/>
                 <BufferingLayer/>
-                <ControlLayer refPlayer={refPlayer} refPlayPause={refPlayPause} refBackward={refBackward} refForward={refForward}/>
+                <CSSTransition in={showControl} timeout={250} classNames="fade-in">
+                    <ControlLayer hide={!showControl} refPlayer={refPlayer} refPlayPause={refPlayPause} refBackward={refBackward} refForward={refForward}/>
+                </CSSTransition>
             </div>
         </div>
     )

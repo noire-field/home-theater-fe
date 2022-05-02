@@ -15,6 +15,7 @@ function VideoPlayer(props: IVideoPlayerProps, ref: any) {
     const muted = useSelector((state: RootState) => state.watch.player.muted)
     const isPlaying = useSelector((state: RootState) => state.watch.player.isPlaying);
     const videoUrl = useSelector((state: RootState) => state.watch.player.videoUrl);
+    const playbackRate = useSelector((state: RootState) => state.watch.player.playbackRate);
 
     if(process.env.NODE_ENV === 'development')
         console.log(`App >> WatchingRoom > RoomWatching > (1)VideoPlayer: Render`);
@@ -50,8 +51,15 @@ function VideoPlayer(props: IVideoPlayerProps, ref: any) {
                 ref={ref}
                 style={{ margin: 0, padding: 0, position: 'relative' }} height='100%' width='100%' 
                 /*onPlay={onPlay} onStart={onStart} onPause={onPause} */onProgress={onProgress}  onBuffer={onBuffer} onBufferEnd={onBufferEnd} onEnded={onEnded}
-                playing={isPlaying} volume={muted ? 0.0 : volume}
+                playing={isPlaying} volume={muted ? 0.0 : volume} playbackRate={playbackRate}
                 url={videoUrl}
+                config={{ 
+                    file: {
+                        tracks: [
+                            { label: 'EngSub', kind: 'subtitles', src: 'https://raw.githubusercontent.com/andreyvit/subtitle-tools/master/sample.srt', srcLang: 'en', default: true},
+                        ]
+                    }
+                 }}
             />
         </div>
     )

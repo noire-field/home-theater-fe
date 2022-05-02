@@ -37,17 +37,15 @@
     opacity: 0;
 }
 .fade-in-exit{
-    opacity: 0;
+    opacity: 1;
 }
 .fade-in-enter-active{
     opacity: 1;
+    transition: opacity 250ms;
 }
 .fade-in-exit-active{
     opacity: 0;
-}
-.fade-in-enter-active,
-.fade-in-exit-active{
-    transition: opacity 500ms;
+    transition: opacity 250ms;
 }
 
 @keyframes simple-fade-in {

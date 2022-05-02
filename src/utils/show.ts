@@ -1,3 +1,7 @@
+import { ISubtitleLine, ISubtitleParsed } from "../Watch.slice";
+
+const patternTimecode = /^(\d{1,2})\:(\d{1,2})\:(\d{1,2}[,.]\d{0,5})$/;
+
 export function PadTimeText(num: number, size: number = 2): string {
     var strNum = num.toString();
     while (strNum.length < size) strNum = "0" + strNum;
@@ -53,4 +57,29 @@ export const CalculateSeekTime = (progress: number, progressAtTime: number) => {
     }
 
     return progress; // No change
+}
+
+export const ParseSubtitle = (subtitle: ISubtitleLine[]): ISubtitleParsed[] => {
+    var parsed: ISubtitleParsed[] = [];
+
+    const regex = new RegExp(patternTimecode, 'i');
+
+    parsed = subtitle.map((s: ISubtitleLine): ISubtitleParsed => {
+        return {
+            id: Number(s.id),
+            startTime: SubtitleTimeCodeToMilisec(s.startTime, regex),
+            endTime: SubtitleTimeCodeToMilisec(s.endTime, regex),
+            text: s.text
+        }
+    });
+
+    return parsed;
+}
+
+export const SubtitleTimeCodeToMilisec = (timecode: string, regex: RegExp): number => {
+    const result = regex.exec(timecode);
+    if(result && result?.length === 4)
+        return (((Number(result[1]) * 60 * 60) + (Number(result[2]) * 60) * 1000)) + (Number(result[3].replace(',', '.')) * 1000)
+
+    return 0;
 }

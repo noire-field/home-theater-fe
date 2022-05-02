@@ -11,6 +11,7 @@ import { WatchSetJoined, WatchSetSubtitle, WatchStatus } from '../Watch.slice';
 
 import { AppAPI, AxiosError, AxiosResponse } from '../utils/api';
 import AppSocket from '../utils/socket';
+import { ParseSubtitle } from '../utils/show';
 
 function WatchingRoom() {
     const dispatch = useAllDispatch();
@@ -24,7 +25,7 @@ function WatchingRoom() {
         console.log(`App >> WatchingRoom: Render (PassCode: ${passCode})`);
 
     useEffect(() => {
-        if(!passCode) return;
+        if(!passCode || status == WatchStatus.WATCH_FINISHED) return;
         if(joinedRoom) {
             if(process.env.NODE_ENV === 'development')
                 console.log(`App >> WatchingRoom: Room Joined`);
@@ -57,8 +58,8 @@ function WatchingRoom() {
             if(res.status === 200) {
                 // @ts-ignore
                 AppSocket.OnRoomJoined(passCode);
-                dispatch(WatchSetJoined({ passCode: passCode || '', showTitle: res.data.showTitle, realStartTime: res.data.realStartTime }));
-                if(res.data.subtitles) dispatch(WatchSetSubtitle(res.data.subtitles));
+                dispatch(WatchSetJoined({ passCode: passCode || '', showTitle: res.data.showTitle, realStartTime: res.data.realStartTime, smartSync: res.data.smartSync }));
+                if(res.data.subtitles) dispatch(WatchSetSubtitle(ParseSubtitle(res.data.subtitles)));
             }
         }).catch((res: AxiosError) => {
 

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { RootState, useAllDispatch } from '../../store';
 import { ModalWatchToggleRoomFound } from '../../Modal.slice';
 import { StyleCompact } from './../../utils/modal';
+import { WatchSetStatus, WatchStatus } from '../../Watch.slice';
 
 function RoomFoundModal() {
     const dispatch = useAllDispatch();
@@ -19,6 +20,7 @@ function RoomFoundModal() {
     const roomInfo = useSelector((state: RootState) => state.modal.watch.roomInfo);
 
     //const [errorCode, setErrorCode] = useState('');
+    const friendlyName = localStorage.getItem('friendlyName') || '';
 
     const onCloseModal = () => {
         //setErrorCode('');
@@ -28,6 +30,8 @@ function RoomFoundModal() {
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         localStorage.setItem('friendlyName', refFriendlyName.current?.value || 'Viewer-007');
+        dispatch(ModalWatchToggleRoomFound({ show: false }));
+        dispatch(WatchSetStatus(WatchStatus.WATCH_WAITING))
         navigate(`/watch/${roomInfo.passCode}`, { replace: true });
     }
 
@@ -43,7 +47,7 @@ function RoomFoundModal() {
                 <p className='text-center text-sm text-gray-300'>({ (new Date(roomInfo.startTime || new Date())).toLocaleString() })</p>
                 <form onSubmit={onSubmit} className='flex flex-row justify-center mt-10 mb-1'>
                     <div className='mr-2'>
-                        <input ref={refFriendlyName} type="text" id="text" className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" maxLength={16} placeholder={t('Field:MyFriendlyName')} required/>
+                        <input ref={refFriendlyName} type="text" id="text" className="border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" maxLength={16} placeholder={t('Field:MyFriendlyName')} defaultValue={friendlyName} required/>
                     </div>
                     <div className=''>
                         <button type="submit" className="transition-all text-white text-uppper text-center font-medium rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-800"><i className="fa-solid fa-arrow-right-to-bracket mr-2"></i>{ t('Action:JoinRoom') }</button>

@@ -75,4 +75,4 @@ function Homepage() {
     )
 }
 
-export default Homepage;
+export default React.memo(Homepage);

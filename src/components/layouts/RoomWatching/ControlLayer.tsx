@@ -11,7 +11,7 @@ import { red } from '@mui/material/colors';
 import Slider from '@mui/material/Slider'
 
 import { RootState, useAllDispatch } from '../../../store';
-import { WatchRequireSeek, WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume } from '../../../Watch.slice';
+import { WatchRequireSeek, WatchSetPlaybackRate, WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume } from '../../../Watch.slice';
 
 import { DurationSecondToText } from '../../../utils/show';
 import AppSocket from '../../../utils/socket';
@@ -23,6 +23,7 @@ const theme = createTheme({
 });
 
 interface IControlLayerProps {
+    hide: boolean;
     refPlayer: any;
     refBackward: LegacyRef<HTMLDivElement> | undefined;
     refForward: LegacyRef<HTMLDivElement> | undefined;
@@ -36,17 +37,23 @@ function ControlLayer(props: IControlLayerProps) {
     const showTitle = useSelector((state: RootState) => state.watch.show.title);
     const videoProgress = useSelector((state: RootState) => state.watch.player.progress);
     const videoDuration = useSelector((state: RootState) => state.watch.player.duration);
+    const realStartTime = useSelector((state: RootState) => state.watch.show.realStartTime);
     const allowControl = useSelector((state: RootState) => state.watch.player.allowControl);
     const requireSeek = useSelector((state: RootState) => state.watch.requireSeek);
 
     const isPlaying = useSelector((state: RootState) => state.watch.player.isPlaying);
+    const isBuffering = useSelector((state: RootState) => state.watch.player.isBuffering);
     const isFullScreen = useSelector((state: RootState) => state.watch.player.isFullScreen);
     const muted = useSelector((state: RootState) => state.watch.player.muted);
+    const playbackRate = useSelector((state: RootState) => state.watch.player.playbackRate);
+    const smartSync = useSelector((state: RootState) => state.watch.show.smartSync) > 0 ? true : false;
 
     const [sliderProgress, setSliderProgress] = useState(0);
     const [sliding, setSliding] = useState(false);
     const [volume, setVolume] = useState(0.0);
-    
+    const [delayTime, setDelayTime] = useState(0.00);
+    const [showSmartSync, setShowSmartSync] = useState(false);
+
     if(process.env.NODE_ENV === 'development')
         console.log(`App >> WatchingRoom > RoomWatching > (3)ControlLayer: Render`);
 
@@ -130,8 +137,43 @@ function ControlLayer(props: IControlLayerProps) {
         dispatch(WatchRequireSeek({ on: false, to: 0.0 }));
     }, [requireSeek.on, requireSeek.to])
 
+    useEffect(() => {
+        if(!smartSync) return; // SmartSync is OFF
+        if(!isPlaying || requireSeek.on || isBuffering) return; 
+        const player = props.refPlayer.current;
+
+        if(!player) return;
+        
+        const timer = setInterval(() => {
+            const startTime = new Date(realStartTime);
+            const supposedTime = new Date().getTime() - startTime.getTime();
+
+            const diffTime = (player.getCurrentTime() * 1000) - supposedTime
+            
+            if(diffTime < 0) { // Late!
+                if(diffTime >= - 100 && showSmartSync) setShowSmartSync(false);
+                else if(diffTime < -100 && !showSmartSync) setShowSmartSync(true);
+
+                if(diffTime >= -100) { if(playbackRate != 1.00) dispatch(WatchSetPlaybackRate(1.00)); }
+                else if(diffTime >= -500) { if(playbackRate != 1.125) dispatch(WatchSetPlaybackRate(1.125)); }
+                else if(diffTime >= -1000) { if(playbackRate != 1.25) dispatch(WatchSetPlaybackRate(1.25)); }
+                else if(diffTime >= -3000) { if(playbackRate != 1.5) dispatch(WatchSetPlaybackRate(1.5)); }
+                else { // Late more than 3 seconds
+                    // Seek!
+                    dispatch(WatchRequireSeek({ on: true, to: supposedTime / 1000 }));
+                }
+            }
+
+            setDelayTime(diffTime);
+        }, 250);
+
+        return () => {
+            clearInterval(timer);
+        }
+    });
+
     return (
-        <div className='absolute left-0 top-0 w-full h-full'>
+        <div className='absolute left-0 top-0 w-full h-full'  style={props.hide ? { position: 'fixed', left: '99999px', opacity: 0 } : { }}>
             <ThemeProvider theme={theme}>
             <div className='flex flex-col justify-between h-screen p-3 md:p-10 text-shiro'>
                 <div>
@@ -160,7 +202,10 @@ function ControlLayer(props: IControlLayerProps) {
                     <Slider value={sliding ? sliderProgress : videoProgress} onChange={onProgressSliderChange} max={videoDuration} step={1} color={'primary'}/>
                     <div className='grid grid-cols-12 mt-3'>
                         <div className='col-span-5'>
-                            <button className='btn btn-sm btn-blue'>Vote for pausing</button>
+                            <div className='flex flex-row items-center'>
+                                <button className='btn btn-sm btn-blue mr-3'>Vote for pausing</button>
+                                { showSmartSync && <p className='text-green-400'>{ t('Watch:SmartSync.Syncing') } ({ t('Watch:SmartSync.Delay')}: { delayTime.toFixed(2) }) ({ t('Watch:SmartSync.Rate')}: { playbackRate })</p> }
+                            </div>
                         </div>
                         <div className='center-controls col-span-2 flex justify-center'>
                             <div ref={props.refBackward} onClick={onFastMove.bind(null, false)}><FontAwesomeIcon className='fast-button text-gray-100 hover:cursor-pointer hover:text-gray-300 active:text-gray-500' icon={faBackward}/></div>

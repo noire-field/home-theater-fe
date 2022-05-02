@@ -28,7 +28,7 @@ class AppSocket {
         this.client.on('StartWatching', this.OnStartWatching);
         this.client.on('VideoAction', this.OnVideoAction);
         this.client.on('FinishWatching', this.OnFinishWatching);
-        this.client.on('KickUserOut', this.OnKickUserOut);
+        //this.client.on('KickUserOut', this.OnKickUserOut);
     }
 
     GetClient(): Socket {
@@ -140,9 +140,10 @@ class AppSocket {
         store.dispatch(WatchFinish(res));
     }
 
+    /*
     OnKickUserOut() {
 
-    }
+    }*/
 }
 
 export default new AppSocket();
