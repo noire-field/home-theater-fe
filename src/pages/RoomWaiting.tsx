@@ -57,6 +57,8 @@ function RoomWaiting() {
             <div>
                <p className='text-center uppercase tracking-widest text-2xl'>{ showTitle }</p>
                <p className='text-center tracking-widest text-5xl'><CountdownTimer/></p>
+
+               <p className='text-center mt-10'>{ t('Watch:Waiting.VolumeIssue1') }<br/>{ t('Watch:Waiting.VolumeIssue2') }</p>
             </div>
             <div className='flex flex-col md:flex-row justify-between align-middle'>
                 <div className='mb-3 md:mb-0 text-center md:text-left'>

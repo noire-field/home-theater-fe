@@ -19,6 +19,14 @@ const Watch = {
         "WeFoundRoom": "We found a room that matches your code!",
         "WhyFriendlyName": "This will help friends in room to recognize you easily."
     },
+    "Waiting": {
+        "VolumeIssue1": "In order to protect user's privacy, the video will start with muted volume.",
+        "VolumeIssue2": "After it starts, please manually adjust the volume as you like!"
+    },
+    "Watching": {
+        "VoteToPause": "{{ name }} wants to pause the movie for a while, do you agree?",
+        "VoteToResume": "{{ name }} wants to resume the movie, do you agree?"
+    },
     "Finished": {
         "TheEnd": "The End",
         "HopeYouLikeIt": "The show has ended, we hope you like it!"
@@ -42,7 +50,11 @@ const Action = {
     "PreviewMovie": "Preview Movie",
     "AddWaitTime": "More 5 Minutes Wait",
     "StartNow": "Start Now",
-    "ReturnHomepage": "Return To Homepage"
+    "ReturnHomepage": "Return To Homepage",
+    "VoteToPause": "Vote for pausing",
+    "VoteToResume": "Vote for resuming",
+    "Yes": "Yes",
+    "No": "No"
 }
 
 const Field = {

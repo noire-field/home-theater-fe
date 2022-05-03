@@ -11,7 +11,7 @@ import { red } from '@mui/material/colors';
 import Slider from '@mui/material/Slider'
 
 import { RootState, useAllDispatch } from '../../../store';
-import { WatchRequireSeek, WatchSetPlaybackRate, WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume } from '../../../Watch.slice';
+import { WatchRequireSeek, WatchSetLastSlideAt, WatchSetPlaybackRate, WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetSubtitleIndex } from '../../../Watch.slice';
 
 import { DurationSecondToText } from '../../../utils/show';
 import AppSocket from '../../../utils/socket';
@@ -48,6 +48,8 @@ function ControlLayer(props: IControlLayerProps) {
     const playbackRate = useSelector((state: RootState) => state.watch.player.playbackRate);
     const smartSync = useSelector((state: RootState) => state.watch.show.smartSync) > 0 ? true : false;
 
+    const votingEnabled = useSelector((state: RootState) => state.watch.voting.on);
+
     const [sliderProgress, setSliderProgress] = useState(0);
     const [sliding, setSliding] = useState(false);
     const [volume, setVolume] = useState(0.0);
@@ -65,6 +67,7 @@ function ControlLayer(props: IControlLayerProps) {
 
         if(!sliding) setSliding(true);
 
+        CheckSelfSubtitle(newProgress);
         setSliderProgress(newProgress)
         onVideoSeek(newProgress);
     }
@@ -90,6 +93,7 @@ function ControlLayer(props: IControlLayerProps) {
 
         if(!sliding) setSliding(true);
 
+        CheckSelfSubtitle(targetProgress);
         setSliderProgress(targetProgress);
         onVideoSeek(targetProgress);
     }
@@ -120,6 +124,7 @@ function ControlLayer(props: IControlLayerProps) {
     const onVideoSeek = useCallback(debounce((to) => {
         setSliding(false);
 
+
         if(!allowControl) return;
 
         dispatch(WatchSetPlayerProgress(to));
@@ -127,6 +132,16 @@ function ControlLayer(props: IControlLayerProps) {
 
         AppSocket.SlideShow(to);
     }, 500), [allowControl, props.refPlayer]);
+
+    const CheckSelfSubtitle = (to: number) => {
+        console.log(`Slide ${videoProgress} > ${to}`);
+
+        dispatch(WatchSetLastSlideAt(new Date().getTime()));
+        
+        // This is a moving backward? if yes, reset the subtitle index (Only self)
+        if(videoProgress > to)
+            dispatch(WatchSetSubtitleIndex(-1));
+    }
 
     useEffect(() => {
         if(!requireSeek.on) return;
@@ -156,7 +171,7 @@ function ControlLayer(props: IControlLayerProps) {
 
                 if(diffTime >= -100) { if(playbackRate != 1.00) dispatch(WatchSetPlaybackRate(1.00)); }
                 else if(diffTime >= -500) { if(playbackRate != 1.125) dispatch(WatchSetPlaybackRate(1.125)); }
-                else if(diffTime >= -1000) { if(playbackRate != 1.25) dispatch(WatchSetPlaybackRate(1.25)); }
+                else if(diffTime >= -1500) { if(playbackRate != 1.25) dispatch(WatchSetPlaybackRate(1.25)); }
                 else if(diffTime >= -3000) { if(playbackRate != 1.5) dispatch(WatchSetPlaybackRate(1.5)); }
                 else { // Late more than 3 seconds
                     // Seek!
@@ -182,16 +197,18 @@ function ControlLayer(props: IControlLayerProps) {
                             <h1 className="text-3xl mt-10 md:mt-0 text-center uppercase">{ showTitle }</h1>
                         </div>
                         <div className='w-500 max-w-full'>
+                            { votingEnabled && 
                             <div className="px-4 py-2 bg-blue-100 rounded-lg dark:bg-blue-200" role="alert">
                                 <div className="flex items-center">
                                     <svg className="mr-1 w-5 h-5 text-blue-700 dark:text-blue-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path></svg>
-                                    <p className="text-lg font-medium text-blue-700 dark:text-blue-800">Justas wants to pause the movie for a while, do you agree?</p>
+                                    <p className="text-lg font-medium text-blue-700 dark:text-blue-800">{ t('Watch:Watching.VoteToPause') }</p>
                                 </div>
                                 <div className='flex justify-end'>
-                                    <button className='btn btn-sm btn-blue mr-1'>Agree (10)</button>
-                                    <button className='btn btn-sm btn-blue'>No (10)</button>
+                                    <button className='btn btn-sm btn-blue mr-1'>{ t('Action:Yes') } (10)</button>
+                                    <button className='btn btn-sm btn-blue'>{ t('Action:No') } (10)</button>
                                 </div>
                             </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -203,7 +220,7 @@ function ControlLayer(props: IControlLayerProps) {
                     <div className='grid grid-cols-12 mt-3'>
                         <div className='col-span-5'>
                             <div className='flex flex-row items-center'>
-                                <button className='btn btn-sm btn-blue mr-3'>Vote for pausing</button>
+                                { votingEnabled && <button className='btn btn-sm btn-blue mr-3'>{ t('Action:VoteToPause') }</button> }
                                 { showSmartSync && <p className='text-green-400'>{ t('Watch:SmartSync.Syncing') } ({ t('Watch:SmartSync.Delay')}: { delayTime.toFixed(2) }) ({ t('Watch:SmartSync.Rate')}: { playbackRate })</p> }
                             </div>
                         </div>

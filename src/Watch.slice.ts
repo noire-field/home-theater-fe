@@ -87,6 +87,13 @@ export interface WatchState {
     requireSeek: {
         on: boolean;
         to: number;
+    },
+    subtitle: {
+        index: number;
+        lastSlideAt: number;
+    },
+    voting: {
+        on: boolean;
     }
 }
 
@@ -119,6 +126,13 @@ const initialState: WatchState = {
     requireSeek: {
         on: false,
         to: 0.0
+    },
+    subtitle: {
+        index: -1,
+        lastSlideAt: 0
+    },
+    voting: {
+        on: false
     }
 }
 
@@ -179,6 +193,16 @@ export const WatchSlice = createSlice({
             state.viewers = [];
             state.player.volume = 0.0;
             state.show.subtitles = [];
+            state.subtitle.index = -1;
+        },
+        WatchSetSubtitleIndex(state, action: PayloadAction<number>) {
+            state.subtitle.index = action.payload
+        },
+        WatchSetLastSlideAt(state, action: PayloadAction<number>) {
+            state.subtitle.lastSlideAt = action.payload;
+        },
+        WatchEnableVoting(state, action: PayloadAction<boolean>) {
+            state.voting.on = action.payload;
         }
     }
 });
@@ -186,7 +210,8 @@ export const WatchSlice = createSlice({
 export const { 
     WatchSetSocketConnected, WatchSetJoined, WatchSetSubtitle, WatchSetViewers, WatchSetStartTime, WatchSetStatus, WatchSetPlaybackRate,
     WatchSetPlayerBuffering, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetPlayerMuted, WatchSetShowControl,
-    WatchSetPlayerFullScreen, WatchSetPlayerAllowControl, WatchPrepareToWatch, WatchStart, WatchRequireSeek, WatchFinish
+    WatchSetPlayerFullScreen, WatchSetPlayerAllowControl, WatchPrepareToWatch, WatchStart, WatchRequireSeek, WatchFinish,
+    WatchSetSubtitleIndex, WatchSetLastSlideAt, WatchEnableVoting
 } = WatchSlice.actions;
 
 // Export

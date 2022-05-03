@@ -103,7 +103,7 @@ function RoomWatching() {
         <div className='watching-room simple-fade-in' style={watchStatus == WatchStatus.WATCH_INIT ? { position: 'fixed', left: '99999px', opacity: 0 } : { }}>
             <div className="wrapper">
                 <VideoPlayer ref={refPlayer}/>
-                <SubtitleViewer/>
+                <SubtitleViewer refPlayer={refPlayer}/>
                 <BufferingLayer/>
                 <CSSTransition in={showControl} timeout={250} classNames="fade-in">
                     <ControlLayer hide={!showControl} refPlayer={refPlayer} refPlayPause={refPlayPause} refBackward={refBackward} refForward={refForward}/>

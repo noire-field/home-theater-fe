@@ -1,7 +1,7 @@
 import io, { Socket } from "socket.io-client";
 
 import { store } from './../store';
-import { IViewer, WatchSetSocketConnected, WatchSetPlayerBuffering, WatchSetViewers, WatchSetStartTime, WatchPrepareToWatch, IPrepareToWatch, IStartWatching, WatchStart, WatchRequireSeek, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchStatus, IFinishWatch, WatchFinish } from "../Watch.slice";
+import { IViewer, WatchSetSocketConnected, WatchSetPlayerBuffering, WatchSetViewers, WatchSetStartTime, WatchPrepareToWatch, IPrepareToWatch, IStartWatching, WatchStart, WatchRequireSeek, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchStatus, IFinishWatch, WatchFinish, WatchSetSubtitleIndex, WatchSetLastSlideAt } from "../Watch.slice";
 import { CalculateSeekTime } from "./show";
 
 class AppSocket {
@@ -129,8 +129,15 @@ class AppSocket {
                 const currentTime = new Date().getTime()
                 const correctProgress = res.data.progress + ((currentTime - res.data.sendTime) / 1000);
 
+                store.dispatch(WatchSetLastSlideAt(new Date().getTime()));
+                
+                // This is a moving backward? if yes, reset the subtitle index (Only other client)
+                if(store.getState().watch.player.progress > correctProgress)
+                    store.dispatch(WatchSetSubtitleIndex(-1));
+
                 store.dispatch(WatchRequireSeek({ on: true, to: correctProgress }));
                 store.dispatch(WatchSetStartTime(res.data.realStartTime));
+                
                 
                 break;
         }

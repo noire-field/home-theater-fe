@@ -53,13 +53,6 @@ function VideoPlayer(props: IVideoPlayerProps, ref: any) {
                 /*onPlay={onPlay} onStart={onStart} onPause={onPause} */onProgress={onProgress}  onBuffer={onBuffer} onBufferEnd={onBufferEnd} onEnded={onEnded}
                 playing={isPlaying} volume={muted ? 0.0 : volume} playbackRate={playbackRate}
                 url={videoUrl}
-                config={{ 
-                    file: {
-                        tracks: [
-                            { label: 'EngSub', kind: 'subtitles', src: 'https://raw.githubusercontent.com/andreyvit/subtitle-tools/master/sample.srt', srcLang: 'en', default: true},
-                        ]
-                    }
-                 }}
             />
         </div>
     )
