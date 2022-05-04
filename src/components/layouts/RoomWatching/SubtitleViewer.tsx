@@ -1,20 +1,17 @@
 import React, { LegacyRef, useCallback, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
-import debounce from 'lodash.debounce';
 
 import { RootState, useAllDispatch } from '../../../store';
 import { WatchSetSubtitleIndex } from '../../../Watch.slice';
-
 
 interface ISubtitleViewerProps {
     refPlayer: any;
 }
   
-
 function SubtitleViewer(props: ISubtitleViewerProps) {
     const dispatch = useAllDispatch();
 
+    const subtitleOn = useSelector((state: RootState) => state.watch.subtitle.on);
     const showControl = useSelector((state: RootState) => state.watch.player.showControl);
     const isPlaying = useSelector((state: RootState) => state.watch.player.isPlaying);
     const subtitles = useSelector((state: RootState) => state.watch.show.subtitles);
@@ -28,7 +25,7 @@ function SubtitleViewer(props: ISubtitleViewerProps) {
 
     useEffect(() => {
         var player = props.refPlayer.current;
-        if(!player || !subtitles || subtitles.length <= 0) return;
+        if(!subtitleOn || !player || !subtitles || subtitles.length <= 0) return;
         
         const timer = setInterval(() => {
             if(subIndex >= subtitles.length || !isPlaying) return; // No more sub
@@ -65,22 +62,27 @@ function SubtitleViewer(props: ISubtitleViewerProps) {
         if(subIndex + 1 >= subtitles.length)
             return;
 
+        // @ts-ignore
         let currentTime = player.getCurrentTime() * 1000; // Convert to milisec
 
         var nextLineIndex: number = -1;
         for(let i = subIndex; i < subtitles.length; i++) {
             if(i === -1) continue;
-            if(currentTime >= subtitles[i].startTime)
+            if(currentTime >= subtitles[i].startTime) {
                 nextLineIndex = i;
+            } else {
+                break;
+            }
         }
 
-        if(nextLineIndex !== -1) {
+        if(nextLineIndex !== -1 && currentTime < subtitles[nextLineIndex].endTime) {
             dispatch(WatchSetSubtitleIndex(nextLineIndex));
             setText(subtitles[nextLineIndex].text);
         }
     }
 
-    if(!subtitles || subtitles.length <= 0) 
+
+    if(!subtitleOn || !subtitles || subtitles.length <= 0) 
         return null;
 
     return (

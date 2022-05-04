@@ -13,9 +13,10 @@ import Homepage from './pages/Homepage';
 import ManageRoom from './pages/ManageRoom';
 import AdminLogin from './pages/AdminLogin';
 import WatchingRoom from './pages/WatchingRoom';
+import FinishedWatching from './pages/FinishedWatching';
 
 import LoadingOverlay from './components/LoadingOverlay';
-import FinishedWatching from './pages/FinishedWatching';
+import PreviewMovie from './features/PreviewMovie';
 
 function App() {
 	const dispatch = useAllDispatch();
@@ -63,6 +64,7 @@ function App() {
 					<Route path="/" element={<Homepage />}/>
 					<Route path="/manage-room" element={<ManageRoom />}/>
 					<Route path="/admin-login" element={<AdminLogin />}/>
+					<Route path="/preview/:passCode" element={<PreviewMovie />}/>
 					<Route path="/watch/:passCode" element={<WatchingRoom />}/>
 					<Route path="/finished" element={<FinishedWatching />}/>
 				</Routes> 

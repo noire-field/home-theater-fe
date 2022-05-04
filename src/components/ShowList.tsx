@@ -7,6 +7,7 @@ import { DurationSecondToText } from '../utils/show';
 import { RootState, useAllDispatch } from '../store';
 import { MovieShow } from '../Show.slice';
 import { ModalShowToggleEdit } from '../Modal.slice';
+import { Link } from 'react-router-dom';
 
 function ShowList() {
     const dispatch = useAllDispatch();
@@ -43,7 +44,8 @@ function ShowList() {
                 <td className='px-6 py-4 text-center'>{ show.smartSync > 0 ? <span className='text-green-500'><i className="fa-solid fa-circle-check"></i></span> : '-' }</td>
                 <td className="px-6 py-4">{ statusContent }</td>
                 <td className="px-6 py-4">
-                    <a onClick={onClickEdit.bind(null, show.id)} href="#" className="font-medium text-yellow-500 hover:underline"><i className="fa-solid fa-pen-to-square mr-1"></i>Edit</a>
+                    <Link to={`/?join=${show.passCode}`} target='_blank' className="font-medium text-pink-500 hover:underline mr-2"><i className="fa-solid fa-link mr-1"></i>{ t('Action:Share') }</Link>
+                    <a onClick={onClickEdit.bind(null, show.id)} href="#" className="font-medium text-yellow-500 hover:underline"><i className="fa-solid fa-pen-to-square mr-1"></i>{ t('Action:Edit') }</a>
                 </td>
             </tr>
         )

@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useAllDispatch } from '../store';
@@ -14,6 +14,7 @@ import { ModalWatchToggleRoomFound } from '../Modal.slice';
 function Homepage() {
     const dispatch = useAllDispatch();
     const { t } = useTranslation();
+    const [searchParams] = useSearchParams();
 
     const [errorCode, setErrorCode] = useState('');
     const refPassCode = useRef<HTMLInputElement>(null);
@@ -23,7 +24,10 @@ function Homepage() {
 
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        
+        OnClickFindRoom();
+    }
+
+    const OnClickFindRoom = () => {
         dispatch(AppSetLoading(true));
 
         AppAPI.get(`/watch/find-room/${refPassCode.current?.value || ''}`).then((res: AxiosResponse) => {
@@ -39,6 +43,16 @@ function Homepage() {
             dispatch(AppSetLoading(false));
         })
     }
+
+    useEffect(() => {
+        if(!refPassCode.current) return;
+
+        const joinRoom = searchParams.get('join');
+        if(joinRoom) {
+            refPassCode.current.value = joinRoom || '';
+            OnClickFindRoom();
+        }
+    }, [refPassCode]);
 
     return (
         <div className='flex flex-col justify-between h-screen p-3 md:p-10 text-shiro simple-fade-in'>

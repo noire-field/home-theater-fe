@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { RootState, useAllDispatch } from '../store';
 import { AppSetLoading } from '../App.slice';
 
 import Header from '../components/layouts/Header';
 import CountdownTimer from '../components/CountdownTimer';
+
 import { AppAPI, AxiosError, AxiosResponse } from '../utils/api';
 
 function RoomWaiting() {
     const dispatch = useAllDispatch();
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const loggedIn = useSelector((state: RootState) => state.user.loggedIn);
     const isAdmin = useSelector((state: RootState) => state.user.isAdmin);
@@ -69,7 +72,7 @@ function RoomWaiting() {
                 </div>
                 <div className='flex flex-row justify-center pt-0 md:pt-5'>
                 { (loggedIn && isAdmin) && <React.Fragment>
-                    <button className='btn btn-blue h-15 leading-4 md:h-10 mr-2'><i className="fa-solid fa-eye mr-1"></i>{ t('Action:PreviewMovie') }</button>
+                    <button onClick={() => window.open(`/preview/${passCode}`)} className='btn btn-blue h-15 leading-4 md:h-10 mr-2'><i className="fa-solid fa-eye mr-1"></i>{ t('Action:PreviewMovie') }</button>
                     <button onClick={onClickAddMoreTime} className='btn btn-blue h-15 leading-4 md:h-10 mr-2'><i className="fa-solid fa-clock-rotate-left mr-1"></i>{ t('Action:AddWaitTime') }</button>
                     <button onClick={onClickStartNow} className='btn btn-pink h-15 leading-4 md:h-10'><i className="fa-solid fa-circle-play mr-1"></i>{ t('Action:StartNow') }</button>
                 </React.Fragment> }

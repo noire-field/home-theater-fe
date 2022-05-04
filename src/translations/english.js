@@ -54,7 +54,8 @@ const Action = {
     "VoteToPause": "Vote for pausing",
     "VoteToResume": "Vote for resuming",
     "Yes": "Yes",
-    "No": "No"
+    "No": "No",
+    "Share": "Share"
 }
 
 const Field = {
@@ -101,7 +102,9 @@ const Error = {
     },
     "Watch": {
         "RoomNotFound": "Unable to find room with this code.",
-        "UnableToEnterFullScreen": "Unable to enter full-screen mode, permission denied."
+        "UnableToEnterFullScreen": "Unable to enter full-screen mode, permission denied.",
+        "RoomAlreadyStarted": "This room has already started.",
+        "RoomAlreadyFinished": "This room has already finished."
     }
 }
 

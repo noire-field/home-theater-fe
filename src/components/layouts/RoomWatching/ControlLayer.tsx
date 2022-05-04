@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next';
 import debounce from 'lodash.debounce';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCompress, faExpand, faVolumeMute, faVolumeUp, faVolumeDown, faPlay, faPause, faForward, faBackward } from '@fortawesome/free-solid-svg-icons'
+import { faCompress, faExpand, faVolumeMute, faVolumeUp, faVolumeDown, faPlay, faPause, faForward, faBackward, faClosedCaptioning } from '@fortawesome/free-solid-svg-icons'
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
 import Slider from '@mui/material/Slider'
 
 import { RootState, useAllDispatch } from '../../../store';
-import { WatchRequireSeek, WatchSetLastSlideAt, WatchSetPlaybackRate, WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetSubtitleIndex } from '../../../Watch.slice';
+import { WatchEnableSubtitle, WatchRequireSeek, WatchSetLastSlideAt, WatchSetPlaybackRate, WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetSubtitleIndex } from '../../../Watch.slice';
 
 import { DurationSecondToText } from '../../../utils/show';
 import AppSocket from '../../../utils/socket';
@@ -48,6 +48,8 @@ function ControlLayer(props: IControlLayerProps) {
     const playbackRate = useSelector((state: RootState) => state.watch.player.playbackRate);
     const smartSync = useSelector((state: RootState) => state.watch.show.smartSync) > 0 ? true : false;
 
+    const subtitleCount = useSelector((state: RootState) => state.watch.show.subtitles.length);
+    const subtitleEnable = useSelector((state: RootState) => state.watch.subtitle.on);
     const votingEnabled = useSelector((state: RootState) => state.watch.voting.on);
 
     const [sliderProgress, setSliderProgress] = useState(0);
@@ -133,9 +135,11 @@ function ControlLayer(props: IControlLayerProps) {
         AppSocket.SlideShow(to);
     }, 500), [allowControl, props.refPlayer]);
 
-    const CheckSelfSubtitle = (to: number) => {
-        console.log(`Slide ${videoProgress} > ${to}`);
+    const onClickSubtitle = () => {
+        dispatch(WatchEnableSubtitle(!subtitleEnable));
+    }
 
+    const CheckSelfSubtitle = (to: number) => {
         dispatch(WatchSetLastSlideAt(new Date().getTime()));
         
         // This is a moving backward? if yes, reset the subtitle index (Only self)
@@ -230,9 +234,10 @@ function ControlLayer(props: IControlLayerProps) {
                             <div ref={props.refForward} onClick={onFastMove.bind(null, true)}><FontAwesomeIcon className='fast-button text-gray-100 hover:cursor-pointer hover:text-gray-300 active:text-gray-500' icon={faForward}/></div>
                         </div>
                         <div className='col-span-5 flex justify-end'>
+                            { subtitleCount > 0 && <span onClick={onClickSubtitle} className={`${subtitleEnable ? 'text-white hover:text-gray-300 active:text-gray-500' : 'text-gray-600 hover:text-gray-400 active:text-gray-500'} hover:cursor-pointer leading-none text-xl mt-1.5 mr-4`}><FontAwesomeIcon icon={faClosedCaptioning}/></span> }
                             <div className="flex justify-center align-middle">
                                 <span onClick={onClickMute} className={`text-white hover:cursor-pointer hover:text-gray-300 active:text-gray-500 leading-none text-xl mt-1.5 mr-4`}><FontAwesomeIcon icon={(muted || volume <= 0) ? faVolumeMute : (volume >= 0.35 ? faVolumeUp : faVolumeDown) }/></span>
-                                <div className='w-200 mt-0.5'><Slider value={volume} onChange={onVolumeChange} max={1} step={0.1} min={0} color='primary'/></div>
+                                <div className='w-150 mt-0.5'><Slider value={volume} onChange={onVolumeChange} max={1} step={0.1} min={0} color='primary'/></div>
                             </div>
                             <p className='ml-4 mt-1'>{ DurationSecondToText(sliding ? sliderProgress : videoProgress) } <span className="text-muted">/</span> { DurationSecondToText(videoDuration) }</p>
                             <span onClick={onToggleFullScreen} className={`transition-all text-3xl ml-3 text-gray-100 hover:cursor-pointer hover:text-gray-300 active:text-gray-500`}><FontAwesomeIcon icon={isFullScreen === true ? faCompress : faExpand}/></span>
