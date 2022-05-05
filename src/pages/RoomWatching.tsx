@@ -20,6 +20,7 @@ function RoomWatching() {
     const watchStatus = useSelector((state: RootState) => state.watch.status);
     const allowControl = useSelector((state: RootState) => state.watch.player.allowControl);
     const showControl = useSelector((state: RootState) => state.watch.player.showControl);
+    const votingActive = useSelector((state: RootState) => state.watch.voting.active);
 
     const refPlayer = React.createRef();
 
@@ -98,6 +99,17 @@ function RoomWatching() {
             setTimeout(hideControls, 500);
         }
     }, [watchStatus]);
+
+    useEffect(() => {
+        if(!votingActive) return;
+
+        const timer = setInterval(() => {
+            dispatch(WatchSetShowControl(true));
+            setTimeout(hideControls, 1500);
+        }, 1000);
+
+        return () => { clearInterval(timer); }
+    }, [votingActive]);
 
     return (
         <div className='watching-room simple-fade-in' style={watchStatus == WatchStatus.WATCH_INIT ? { position: 'fixed', left: '99999px', opacity: 0 } : { }}>

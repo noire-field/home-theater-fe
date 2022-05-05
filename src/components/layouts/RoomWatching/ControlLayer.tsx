@@ -5,10 +5,12 @@ import debounce from 'lodash.debounce';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCompress, faExpand, faVolumeMute, faVolumeUp, faVolumeDown, faPlay, faPause, faForward, faBackward, faClosedCaptioning } from '@fortawesome/free-solid-svg-icons'
-
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
 import Slider from '@mui/material/Slider'
+
+import VotingBanner from './VotingBanner';
+import VotingButton from './VotingButton';
 
 import { RootState, useAllDispatch } from '../../../store';
 import { WatchEnableSubtitle, WatchRequireSeek, WatchSetLastSlideAt, WatchSetPlaybackRate, WatchSetPlayerBuffering, WatchSetPlayerMuted, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetSubtitleIndex } from '../../../Watch.slice';
@@ -50,7 +52,6 @@ function ControlLayer(props: IControlLayerProps) {
 
     const subtitleCount = useSelector((state: RootState) => state.watch.show.subtitles.length);
     const subtitleEnable = useSelector((state: RootState) => state.watch.subtitle.on);
-    const votingEnabled = useSelector((state: RootState) => state.watch.voting.on);
 
     const [sliderProgress, setSliderProgress] = useState(0);
     const [sliding, setSliding] = useState(false);
@@ -192,27 +193,16 @@ function ControlLayer(props: IControlLayerProps) {
     });
 
     return (
-        <div className='absolute left-0 top-0 w-full h-full'  style={props.hide ? { position: 'fixed', left: '99999px', opacity: 0 } : { }}>
+        <div className='absolute left-0 top-0 w-full h-full bg-control-layer'  style={props.hide ? { position: 'fixed', left: '99999px', opacity: 0 } : { }}>
             <ThemeProvider theme={theme}>
             <div className='flex flex-col justify-between h-screen p-3 md:p-10 text-shiro'>
                 <div>
-                    <div className='md:flex md:justify-between'>
+                    <div className='flex flex-col md:flex-row md:justify-between md:items-start items-center'>
                         <div className=''>
                             <h1 className="text-3xl mt-10 md:mt-0 text-center uppercase">{ showTitle }</h1>
                         </div>
                         <div className='w-500 max-w-full'>
-                            { votingEnabled && 
-                            <div className="px-4 py-2 bg-blue-100 rounded-lg dark:bg-blue-200" role="alert">
-                                <div className="flex items-center">
-                                    <svg className="mr-1 w-5 h-5 text-blue-700 dark:text-blue-800" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"></path></svg>
-                                    <p className="text-lg font-medium text-blue-700 dark:text-blue-800">{ t('Watch:Watching.VoteToPause') }</p>
-                                </div>
-                                <div className='flex justify-end'>
-                                    <button className='btn btn-sm btn-blue mr-1'>{ t('Action:Yes') } (10)</button>
-                                    <button className='btn btn-sm btn-blue'>{ t('Action:No') } (10)</button>
-                                </div>
-                            </div>
-                            }
+                            <VotingBanner/>
                         </div>
                     </div>
                 </div>
@@ -224,7 +214,7 @@ function ControlLayer(props: IControlLayerProps) {
                     <div className='grid grid-cols-12 mt-3'>
                         <div className='col-span-5'>
                             <div className='flex flex-row items-center'>
-                                { votingEnabled && <button className='btn btn-sm btn-blue mr-3'>{ t('Action:VoteToPause') }</button> }
+                                <VotingButton/>
                                 { showSmartSync && <p className='text-green-400'>{ t('Watch:SmartSync.Syncing') } ({ t('Watch:SmartSync.Delay')}: { delayTime.toFixed(2) }) ({ t('Watch:SmartSync.Rate')}: { playbackRate })</p> }
                             </div>
                         </div>

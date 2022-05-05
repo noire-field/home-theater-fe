@@ -69,6 +69,10 @@
             font-size: 2em;
         }
     }
+
+    .bg-control-layer {
+        background: linear-gradient(0deg, rgba(47,42,126,0) 0%, rgba(0,0,0,0.5) 0%, rgba(7,7,93,0) 20%, rgba(1,1,17,0) 80%, rgba(0,0,0,0.5) 100%);
+    }
 }
 
 @keyframes anim-loading-icon {

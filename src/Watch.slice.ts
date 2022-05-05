@@ -1,6 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ShowStatus } from './Show.slice';
 
+export interface ISetVoting {
+    enable: boolean;
+    active: boolean;
+    toPause: boolean;
+    startTime: number;
+    endTime: number;
+    starterName: string;
+    result: {
+        yes: number;
+        no: number;
+    },
+    voted: number;
+}
+
 export interface IFinishWatch {
     watchStatus: WatchStatus;
     showStatus: ShowStatus;
@@ -23,6 +37,20 @@ export interface IStartWatching {
     playing: boolean;
     progress: number;
     progressAtTime: number;
+    duration: number;
+    voting: {
+        enable: boolean;
+        active: boolean;
+        toPause: boolean;
+        startTime: number;
+        endTime: number;
+        starterName: string;
+        result: {
+            yes: number;
+            no: number;
+        },
+        voted: number;
+    }
 }
 
 export enum WatchStatus {
@@ -94,7 +122,17 @@ export interface WatchState {
         lastSlideAt: number;
     },
     voting: {
-        on: boolean;
+        enable: boolean;
+        active: boolean;
+        toPause: boolean;
+        startTime: number;
+        endTime: number;
+        starterName: string;
+        result: {
+            yes: number;
+            no: number;
+        }
+        voted: number;
     }
 }
 
@@ -134,7 +172,17 @@ const initialState: WatchState = {
         lastSlideAt: 0
     },
     voting: {
-        on: false
+        enable: false,
+        active: false,
+        toPause: true,
+        startTime: 0,
+        endTime: 0,
+        starterName: '',
+        result: {
+            yes: 0,
+            no: 0
+        },
+        voted: -1
     }
 }
 
@@ -173,6 +221,7 @@ export const WatchSlice = createSlice({
         WatchSetShowControl(state, action: PayloadAction<boolean>) { state.player.showControl = action.payload },
         WatchSetPlayerFullScreen(state, action: PayloadAction<boolean>) { state.player.isFullScreen = action.payload },
         WatchSetPlayerAllowControl(state, action: PayloadAction<boolean>) { state.player.allowControl = action.payload },
+        WatchSetDuration(state, action: PayloadAction<number>) { state.player.duration = action.payload },
         WatchPrepareToWatch(state, action: PayloadAction<IPrepareToWatch>) { 
             state.status = action.payload.watchStatus;
             state.player.videoUrl = action.payload.videoUrl;
@@ -206,8 +255,12 @@ export const WatchSlice = createSlice({
         WatchSetLastSlideAt(state, action: PayloadAction<number>) {
             state.subtitle.lastSlideAt = action.payload;
         },
-        WatchEnableVoting(state, action: PayloadAction<boolean>) {
-            state.voting.on = action.payload;
+        WatchSetVoting(state, action: PayloadAction<ISetVoting>) {
+            const voted = state.voting.voted;
+            state.voting = { ...action.payload, voted };
+        },
+        WatchSetVoted(state, action: PayloadAction<number>) {
+            state.voting.voted = action.payload;
         }
     }
 });
@@ -215,8 +268,8 @@ export const WatchSlice = createSlice({
 export const { 
     WatchSetSocketConnected, WatchSetJoined, WatchSetSubtitle, WatchSetViewers, WatchSetStartTime, WatchSetStatus, WatchSetPlaybackRate,
     WatchSetPlayerBuffering, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchSetPlayerVolume, WatchSetPlayerMuted, WatchSetShowControl,
-    WatchSetPlayerFullScreen, WatchSetPlayerAllowControl, WatchPrepareToWatch, WatchStart, WatchRequireSeek, WatchFinish,
-    WatchEnableSubtitle, WatchSetSubtitleIndex, WatchSetLastSlideAt, WatchEnableVoting
+    WatchSetPlayerFullScreen, WatchSetPlayerAllowControl, WatchPrepareToWatch, WatchStart, WatchSetDuration, WatchRequireSeek, WatchFinish,
+    WatchEnableSubtitle, WatchSetSubtitleIndex, WatchSetLastSlideAt, WatchSetVoting, WatchSetVoted
 } = WatchSlice.actions;
 
 // Export

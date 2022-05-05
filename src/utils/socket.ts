@@ -1,7 +1,7 @@
 import io, { Socket } from "socket.io-client";
 
 import { store } from './../store';
-import { IViewer, WatchSetSocketConnected, WatchSetPlayerBuffering, WatchSetViewers, WatchSetStartTime, WatchPrepareToWatch, IPrepareToWatch, IStartWatching, WatchStart, WatchRequireSeek, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchStatus, IFinishWatch, WatchFinish, WatchSetSubtitleIndex, WatchSetLastSlideAt } from "../Watch.slice";
+import { IViewer, WatchSetSocketConnected, WatchSetPlayerBuffering, WatchSetViewers, WatchSetStartTime, WatchPrepareToWatch, IPrepareToWatch, IStartWatching, WatchStart, WatchRequireSeek, WatchSetPlayerPlaying, WatchSetPlayerProgress, WatchStatus, IFinishWatch, WatchFinish, WatchSetSubtitleIndex, WatchSetLastSlideAt, WatchSetDuration, WatchSetVoting, WatchSetVoted } from "../Watch.slice";
 import { CalculateSeekTime } from "./show";
 
 class AppSocket {
@@ -28,7 +28,7 @@ class AppSocket {
         this.client.on('StartWatching', this.OnStartWatching);
         this.client.on('VideoAction', this.OnVideoAction);
         this.client.on('FinishWatching', this.OnFinishWatching);
-        //this.client.on('KickUserOut', this.OnKickUserOut);
+        this.client.on('UpdateVoting', this.OnUpdateVoting);
     }
 
     GetClient(): Socket {
@@ -65,13 +65,21 @@ class AppSocket {
         this.client.emit('VideoAction', { passCode: this.passCode, action: 'Slide', to, sendTime: new Date().getTime() });
     }
 
+    RequestVote(toPause: boolean): void {
+        this.client.emit('Voting', { passCode: this.passCode, action: 'Request', data: { toPause } });
+    }
+
+    Vote(yes: boolean): void {
+        this.client.emit('Voting', { passCode: this.passCode, action: 'Vote', data: { yes } });
+    }
+
     // Built-In Handler
     OnConnect() {
         store.dispatch(WatchSetSocketConnected(true));
     }
 
     OnDisconnect(reason: string) {
-        console.log('Disconnected');
+        //console.log('Disconnected');
     }
 
     OnConnectError(error: Error) {
@@ -98,6 +106,9 @@ class AppSocket {
 
     OnStartWatching(res: IStartWatching) {
         store.dispatch(WatchStart(res));
+        store.dispatch(WatchSetDuration(res.duration));
+        store.dispatch(WatchSetVoting(res.voting));
+        store.dispatch(WatchSetVoted(res.voting.voted)); // WatchSetVoting does not set voted but skip it
         if(res.playing) {
             const targetSeekTime = CalculateSeekTime(res.progress, res.progressAtTime);
             store.dispatch(WatchRequireSeek({ on: true, to: targetSeekTime }))
@@ -138,7 +149,6 @@ class AppSocket {
                 store.dispatch(WatchRequireSeek({ on: true, to: correctProgress }));
                 store.dispatch(WatchSetStartTime(res.data.realStartTime));
                 
-                
                 break;
         }
     }
@@ -147,10 +157,17 @@ class AppSocket {
         store.dispatch(WatchFinish(res));
     }
 
-    /*
-    OnKickUserOut() {
-
-    }*/
+    OnUpdateVoting(res: { action: string, data: any }) {
+        switch(res.action) {
+            case 'Update':
+                store.dispatch(WatchSetVoting(res.data));
+                break;
+            case 'Finish':
+                store.dispatch(WatchSetVoting(res.data));
+                store.dispatch(WatchSetVoted(-1));
+                break;
+        }
+    }
 }
 
 export default new AppSocket();

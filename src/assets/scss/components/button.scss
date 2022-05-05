@@ -6,7 +6,7 @@
     }
 
     &-blue {
-        @apply text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-700 disabled:bg-gray-600 disabled:text-gray-800 disabled:cursor-not-allowed;
+        @apply text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-700 disabled:bg-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed;
     }
 
     &-red {

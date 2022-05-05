@@ -24,8 +24,9 @@ const Watch = {
         "VolumeIssue2": "After it starts, please manually adjust the volume as you like!"
     },
     "Watching": {
-        "VoteToPause": "{{ name }} wants to pause the movie for a while, do you agree?",
-        "VoteToResume": "{{ name }} wants to resume the movie, do you agree?"
+        "VoteToPause": "{{ name }} wants to pause the movie, do you agree?",
+        "VoteToResume": "{{ name }} wants to resume the movie, do you agree?",
+        "StartVote": "Do you want to start a vote?"
     },
     "Finished": {
         "TheEnd": "The End",
