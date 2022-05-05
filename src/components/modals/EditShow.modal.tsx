@@ -157,7 +157,7 @@ function EditShowModal() {
                     </div>
                     <div className='col-span-12 md:col-span-6'>
                         <label htmlFor='show-starttime' className='custom-label'>{ t('Field:StartTime') }</label>
-                        <input ref={inputs.startTime} id='show-starttime' className='custom-input' placeholder='13:30 2022/12/24' maxLength={16} defaultValue={simplifiedTime} required/>
+                        <input ref={inputs.startTime} id='show-starttime' className='custom-input' placeholder='13:30 2022-12-24' maxLength={16} defaultValue={simplifiedTime} required/>
                     </div>
                     <div className='col-span-12 md:col-span-6'>
                         <label htmlFor='show-starttime' className='custom-label'>{ t('Field:Addons') }</label>
